@@ -1,6 +1,6 @@
 <template>
   <div class="start">
-      <router-link to="/game" class="play-button">DEEP ♜ CHESS</router-link>
+      <router-link to="/main" class="play-button">DEEP ♜ CHESS</router-link>
   </div>
 </template>
 
