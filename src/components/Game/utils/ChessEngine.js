@@ -1,6 +1,5 @@
-"use strict";
-console.clear();
 let PIECE_DIR_CALC = 0;
+
 class Utils {
     static colToInt(col) {
         return Board.COLS.indexOf(col);
@@ -189,6 +188,7 @@ class Utils {
         };
     }
 }
+
 class Shape {
     static shape(player, piece) {
         return `<svg class="${player}" width="170" height="170" viewBox="0 0 170 170" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -214,6 +214,7 @@ class Shape {
         return Shape.shape(player, "rook");
     }
 }
+
 class Constraints {
     static generate(args, resultingChecks) {
         let method;
@@ -416,6 +417,7 @@ class Constraints {
         }
     }
 }
+
 class Piece {
     constructor(data) {
         this.moves = [];
@@ -494,6 +496,7 @@ class Piece {
         }
     }
 }
+
 class Board {
     constructor(pieces, piecePositions) {
         this.checksBlack = [];
@@ -682,8 +685,10 @@ class Board {
         return pA.length > pD.length ? `X${pD}` : pA;
     }
 }
+
 Board.COLS = ["A", "B", "C", "D", "E", "F", "G", "H"];
 Board.ROWS = ["1", "2", "3", "4", "5", "6", "7", "8"];
+
 class Game {
     constructor(pieces, piecePositions, turn = "WHITE") {
         this.active = null;
@@ -832,6 +837,7 @@ class Game {
         }
     }
 }
+
 class View {
     constructor(element, game, perspective) {
         this.element = element;
@@ -954,64 +960,14 @@ class View {
         this.element.classList.remove(other);
     }
 }
-class Control {
-    constructor(game, view) {
-        this.inputSpeedAsap = document.getElementById("speed-asap");
-        this.inputSpeedFast = document.getElementById("speed-fast");
-        this.inputSpeedMedium = document.getElementById("speed-medium");
-        this.inputSpeedSlow = document.getElementById("speed-slow");
-        this.inputRandomBlack = document.getElementById("black-random");
-        this.inputRandomWhite = document.getElementById("white-random");
-        this.inputPerspectiveBlack = document.getElementById("black-perspective");
-        this.inputPerspectiveWhite = document.getElementById("white-perspective");
-        this.game = game;
-        this.view = view;
-        this.inputPerspectiveBlack.addEventListener("change", this.updateViewPerspective.bind(this));
-        this.inputPerspectiveWhite.addEventListener("change", this.updateViewPerspective.bind(this));
-        this.updateViewPerspective();
-    }
-    get speed() {
-        if (this.inputSpeedAsap.checked) {
-            return 50;
-        }
-        if (this.inputSpeedFast.checked) {
-            return 250;
-        }
-        if (this.inputSpeedMedium.checked) {
-            return 500;
-        }
-        if (this.inputSpeedSlow.checked) {
-            return 1000;
-        }
-    }
-    autoplay() {
-        const input = this.game.turn === "WHITE" ? this.inputRandomWhite : this.inputRandomBlack;
-        if (!input.checked) {
-            setTimeout(this.autoplay.bind(this), this.speed);
-            return;
-        }
-        const position = this.game.randomMove();
-        this.view.handleTileClick(position);
-        setTimeout(this.autoplay.bind(this), this.speed);
-    }
-    updateViewPerspective() {
-        this.view.setPerspective(this.inputPerspectiveBlack.checked ? "BLACK" : "WHITE");
-    }
-}
-const DEMOS = {
-    castle1: "XD8B3,B1X,C1X,D1X,F1X,G1X",
-    castle2: "XD8B3,B1X,C1X,C2X,D1X,F1X,G1X",
-    castle3: "XD8E3,B1X,C1X,F2X,D1X,F1X,G1X",
-    promote1: "E1,E8,C2C7",
-    promote2: "E1,E8E7,PC2C8",
-    start: "XE7E6,F7F5,D2D4,E2E5",
-    test2: "C8E2,E8,G8H1,D7E4,H7H3,PA2H7,PB2G7,D2D6,E2E39,A1H2,E1B3",
-    test: "C8E2,E8,G8H1,D7E4,H7H3,D1H7,PB2G7,D2D6,E2E39,A1H2,E1B3",
+
+// Export all classes as a single object
+export const ChessEngine = {
+    Utils,
+    Shape,
+    Constraints,
+    Piece,
+    Board,
+    Game,
+    View
 };
-const initialPositions = Utils.getInitialPiecePositions();
-const initialTurn = "WHITE";
-const perspective = "WHITE";
-const game = new Game(Utils.getInitialPieces(), initialPositions, initialTurn);
-const view = new View(document.getElementById("board"), game, perspective);
-const control = new Control(game, view);
-control.autoplay();
