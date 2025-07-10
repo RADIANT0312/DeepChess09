@@ -10,9 +10,7 @@
     <div class="side-bar-content">
       <div class="header">
         <div class="logo">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-          </svg>
+          <img src="/sidebar-logo.svg" alt="DeepChess Logo" width="50" height="50" />
         </div>
         <span class="brand-name" v-show="isExpanded">DeepChess</span>
       </div>

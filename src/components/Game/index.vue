@@ -32,7 +32,7 @@ export default {
     <SideBar @expansion-change="handleSideBarExpansion" />
     <div class="board-area" :style="{ 
       '--top-bar-height': isTopBarExpanded ? '50px' : '10px',
-      '--side-bar-width': isSideBarExpanded ? '350px' : '80px'
+      '--side-bar-width': isSideBarExpanded ? '350px' : '0px'
     }">
         <Board />
     </div>
@@ -44,7 +44,7 @@ export default {
   position: relative;
   min-height: 100vh;
   overflow: hidden;
-  background-color: #1F2828;
+  background-color: #4f5442;
 }
 .board-area {
     display: flex;
