@@ -1,28 +1,22 @@
 <script>
-import TopBar from '../TopBar/index.vue';
+import MainTopBar from '../MainTopBar/maintopbar.vue';
 
 export default {
   name: 'Main',
   components: {
-    TopBar
+    MainTopBar
   }
 }
 </script>
 
 <template>
   <div>
-    <TopBar>
-      <template #center>
-        <el-button
-          class="topbar-white-btn"
-          plain
-          @click="$router.push('/start')"
-        >
-          Back to Start Page
-        </el-button>
-      </template>
-    </TopBar>
-    <h1>Main page of the application.</h1>
+    <MainTopBar>
+    </MainTopBar>
+    <h1>Practice your chess skills.</h1>
+    <div class="main-image">
+      <img src="/public/polygon-background1061-final.jpg" alt="Chess" />
+    </div>
     <div class="main-btn-group">
       <router-link to="/game">
         <el-button class="main-btn" type="primary" plain>Start Chess Game</el-button>
@@ -35,24 +29,6 @@ export default {
 </template>
 
 <style scoped>
-.topbar-white-btn {
-  background: rgba(255,255,255,0.15) !important;
-  color: #fff !important;
-  border: 1px solid rgba(255,255,255,0.3) !important;
-  border-radius: 8px !important;
-  font-weight: 600;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-  transition: all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
-  padding: 10px 24px;
-  font-size: 16px;
-  backdrop-filter: blur(8px);
-}
-.topbar-white-btn:hover {
-  background: rgba(255,255,255,0.25) !important;
-  color: #333 !important;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
-  transform: translateY(-1px);
-}
 .main-btn-group {
   display: flex;
   gap: 24px;
@@ -80,5 +56,26 @@ export default {
   box-shadow: 0 4px 15px rgba(0,0,0,0.18);
   transform: translateY(-2px);
 }
+h1 {
+  /* 调整水平位置：居中 */
+  text-align: center;
+
+  /* 或者左对齐 */
+  /* text-align: left; */
+
+  /* 调整上下外边距 */
+  margin-top: 100px;
+  margin-bottom: 40px;
+
+  /* 你还可以用 padding 调整内边距 */
+  /* padding-left: 20px; */
+}
+.main-image img {
+  width: 300px;
+  height: auto;
+  border-radius: 1px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
 </style>
 
