@@ -1,29 +1,39 @@
 <script>
 import TopBar from '@components/TopBar/index.vue';
+import SideBar from '@components/SideBar/index.vue';
 import Board from '@components/Board/index.vue';
 
 export default {
   name: 'Main',
   components: {
     TopBar,
+    SideBar,
     Board
   },
   data() {
     return {
-      isBarExpanded: false
+      isTopBarExpanded: false,
+      isSideBarExpanded: false
     }
   },
   methods: {
-    handleBarExpansion(isExpanded) {
-      this.isBarExpanded = isExpanded;
+    handleTopBarExpansion(isExpanded) {
+      this.isTopBarExpanded = isExpanded;
+    },
+    handleSideBarExpansion(isExpanded) {
+      this.isSideBarExpanded = isExpanded;
     }
   }
 }
 </script>
 <template>
   <div class="main">
-    <TopBar @expansion-change="handleBarExpansion" />
-    <div class="board-area" :style="{ height: `calc(100vh - ${isBarExpanded ? '56px' : '6px'})`, marginTop: isBarExpanded ? '56px' : '6px' }">
+    <TopBar @expansion-change="handleTopBarExpansion" />
+    <SideBar @expansion-change="handleSideBarExpansion" />
+    <div class="board-area" :style="{ 
+      '--top-bar-height': isTopBarExpanded ? '50px' : '10px',
+      '--side-bar-width': isSideBarExpanded ? '350px' : '80px'
+    }">
         <Board />
     </div>
   </div>
@@ -34,11 +44,17 @@ export default {
   position: relative;
   min-height: 100vh;
   overflow: hidden;
+  background-color: #1F2828;
 }
 .board-area {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    height: calc(100vh - var(--top-bar-height));
+    margin-top: var(--top-bar-height);
+    width: calc(100% - var(--side-bar-width) - 20px); /* 20px for padding */
+    margin-right: calc(var(--side-bar-width) + 10px); /* 10px is the sidebar's right offset */
+    padding-left: 10px;
 }
 </style>
