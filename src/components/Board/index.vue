@@ -186,10 +186,10 @@ export default {
   --color-success: #1d83e0;
   --color-white: #f0f0f0;
   --color-black: #222;
-  --color-board-hue: 30;
-  --color-board-sat: 40%;
-  --color-shadow: hsl(var(--color-board-hue), var(--color-board-sat), 50%);
-  --color-shadow-lighter: hsl(var(--color-board-hue), var(--color-board-sat), 55%);
+  --color-board-hue: 180;
+  --color-board-sat: 12.7%;
+  --color-shadow: hsl(var(--color-board-hue), var(--color-board-sat), 15.9%);
+  --color-shadow-lighter: hsl(var(--color-board-hue), var(--color-board-sat), 25%);
   --transition-ease: cubic-bezier(0.25, 1, 0.5, 1);
   --color-background: var(--color-black);
 }

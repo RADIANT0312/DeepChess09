@@ -84,8 +84,9 @@ export default {
   top: 0;
   left: 0;
   right: 0;
-  height: 6px;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  height: 10px;
+  /* background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); */
+  background: #364b3f;
   z-index: 1000;
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   cursor: pointer;
@@ -100,8 +101,8 @@ export default {
 }
 
 .top-bar.expanded {
-  height: 56px;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 30%, #0f3460 70%, #533483 100%);
+  height: 40px;
+  /* background: linear-gradient(135deg, #1a1a2e 0%, #16213e 30%, #0f3460 70%, #533483 100%); */
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
@@ -110,7 +111,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  height: 56px;
+  height: 100%;
   opacity: 0;
   transform: translateY(-10px);
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -139,7 +140,7 @@ export default {
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: #ffffff;
   cursor: pointer;
-  padding: 10px 12px;
+  padding: 8px 8px;
   border-radius: 8px;
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   display: flex;
@@ -168,8 +169,8 @@ export default {
 }
 
 .pin-button svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 </style>
