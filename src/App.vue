@@ -18,6 +18,8 @@ export default {
 #app {
   width: 100%;
   height: 100vh;
+  background-color: #4f5442;
+  font-family: "Palatin Linotype", cursive;
 }
 
 /* 路由切换动画 */
