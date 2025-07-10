@@ -1,5 +1,5 @@
 <template>
-  <div class="top-bar" :class="{ 'expanded': isExpanded || isPinned }" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
+  <div class="top-bar" :class="{ 'expanded': isExpanded || isPinned || fixed }" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
     <div class="top-bar-content">
       <slot name="content"></slot>
       <div class="controls">
@@ -19,29 +19,40 @@
 <script>
 export default {
   name: 'BaseTopBar',
+  props: {
+    initialPinned: {
+      type: Boolean,
+      default: false
+    },
+    fixed: {
+      type: Boolean,
+      default: false
+    }
+  },
   data() {
     return {
       isExpanded: false,
-      isPinned: false,
+      isPinned: this.initialPinned,
     }
   },
   emits: ['expansion-change'],
   methods: {
     handleMouseEnter() {
-      if (!this.isPinned) {
+      if (!this.isPinned && !this.fixed) {
         this.isExpanded = true;
         this.emitExpansionChange();
       }
     },
 
     handleMouseLeave() {
-      if (!this.isPinned) {
+      if (!this.isPinned && !this.fixed) {
         this.isExpanded = false;
         this.emitExpansionChange();
       }
     },
 
     togglePin() {
+      if (this.initialPinned) return;
       this.isPinned = !this.isPinned;
       if (this.isPinned) {
         this.isExpanded = true;
