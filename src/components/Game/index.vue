@@ -1,5 +1,5 @@
 <script>
-import TopBar from '@components/TopBar/index.vue';
+import TopBar from './topbar.vue';
 import SideBar from '@components/SideBar/index.vue';
 import Board from '@components/Board/index.vue';
 

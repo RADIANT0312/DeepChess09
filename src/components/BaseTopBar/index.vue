@@ -1,54 +1,32 @@
 <template>
   <div class="top-bar" :class="{ 'expanded': isExpanded || isPinned }" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
     <div class="top-bar-content">
-      <div class="time-display">{{ currentTime }}</div>
-      <button class="pin-button" @click="togglePin" :class="{ 'pinned': isPinned }">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path v-if="!isPinned" d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12M8.8,14L10,12.8V4H14V12.8L15.2,14H8.8Z"/>
-          <path v-else d="M14,4V8.5L12,6.5L10,8.5V4H14M16,2H8V10L12,6L16,10V2M18,12.5V11H16.5V12.5H18M18,16V14.5H16.5V16H18M12,20V18.5H10.5V20H12M8,20V18.5H6.5V20H8M8,16V14.5H6.5V16H8M12,16V14.5H10.5V16H12M8,12.5V11H6.5V12.5H8M12,12.5V11H10.5V12.5H12"/>
-        </svg>
-      </button>
+      <slot name="content"></slot>
+      <div class="controls">
+        <slot name="controls">
+          <button class="pin-button" @click="togglePin" :class="{ 'pinned': isPinned }">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path v-if="!isPinned" d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12M8.8,14L10,12.8V4H14V12.8L15.2,14H8.8Z"/>
+              <path v-else d="M14,4V8.5L12,6.5L10,8.5V4H14M16,2H8V10L12,6L16,10V2M18,12.5V11H16.5V12.5H18M18,16V14.5H16.5V16H18M12,20V18.5H10.5V20H12M8,20V18.5H6.5V20H8M8,16V14.5H6.5V16H8M12,16V14.5H10.5V16H12M8,12.5V11H6.5V12.5H8M12,12.5V11H10.5V12.5H12"/>
+            </svg>
+          </button>
+        </slot>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'TopBar',
+  name: 'BaseTopBar',
   data() {
     return {
       isExpanded: false,
       isPinned: false,
-      currentTime: '',
-      timeInterval: null
     }
   },
   emits: ['expansion-change'],
-  mounted() {
-    this.startTimeUpdater();
-  },
-  beforeUnmount() {
-    if (this.timeInterval) {
-      clearInterval(this.timeInterval);
-    }
-  },
   methods: {
-    startTimeUpdater() {
-      this.updateTime();
-      this.timeInterval = setInterval(() => {
-        this.updateTime();
-      }, 1000);
-    },
-
-    updateTime() {
-      const now = new Date();
-      this.currentTime = now.toLocaleTimeString('zh-CN', { 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit' 
-      });
-    },
-
     handleMouseEnter() {
       if (!this.isPinned) {
         this.isExpanded = true;
@@ -85,7 +63,6 @@ export default {
   left: 0;
   right: 0;
   height: 10px;
-  /* background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); */
   background: #364b3f;
   z-index: 1000;
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -102,7 +79,6 @@ export default {
 
 .top-bar.expanded {
   height: 40px;
-  /* background: linear-gradient(135deg, #1a1a2e 0%, #16213e 30%, #0f3460 70%, #533483 100%); */
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
@@ -122,23 +98,9 @@ export default {
   transform: translateY(0);
 }
 
-.time-display {
-  color: #ffffff;
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
 .pin-button {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #ffffff;
   cursor: pointer;
   padding: 8px 8px;
   border-radius: 8px;
