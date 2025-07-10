@@ -192,7 +192,7 @@ class Utils {
 class Shape {
     static shape(player, piece) {
         return `<svg class="${player}" width="170" height="170" viewBox="0 0 170 170" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <use href="#${piece}" />
+      <use href="/chess-pieces.svg#${piece}" />
     </svg>`;
     }
     static shapeBishop(player) {
