@@ -1,11 +1,6 @@
 <script>
-import TopBar from './topbar.vue';
-
 export default {
   name: 'Main',
-  components: {
-    MainTopBar: TopBar
-  },
   data() {
     return {
       imageLoaded: false,

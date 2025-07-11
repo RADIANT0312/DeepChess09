@@ -12,7 +12,7 @@
         <div class="date-display">{{ currentDate }}</div>
       </div>
     </template>
-    <template #controls>
+    <template #content3>
       <div class="controls">
         <el-button
           class="topbar-white-btn"
