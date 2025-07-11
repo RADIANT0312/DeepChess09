@@ -1,10 +1,9 @@
 <template>
   <div class="main-layout">
-
-    <div class="content-wrapper" :class="{ 'shifted': isTopBarExpanded }">
+    <div class="content-wrapper" :class="{ 'shifted': true }">
       <div class="user-center-container">
         <header class="user-center-header">
-          <h1>User Profile</h1>
+          <h1>Your Profile</h1>
         </header>
 
         <section class="profile-section card">
@@ -146,20 +145,17 @@
 
 <script>
 import axios from 'axios';
-// 根据文件结构，从 Profile/index.vue 导入 TopBar/index.vue 的正确路径
-import TopBar from '../BaseTopBar/index.vue'; 
-import TopBar2 from '../MainTopBar/maintopbar.vue';
-import comment from '../comment/index.vue'; // 导入评论组件
+import comment from '@components/comment/index.vue'; // 导入评论组件
 
 export default {
   name: 'ProfileIndex', // 组件名称
   components: {
-    TopBar, // 注册 TopBar 组件
-    comment, // 注册评论组件
-    TopBar2
+    comment // 注册评论组件
   },
   data() {
     return {
+      // 添加一个开关来控制是否使用模拟数据
+      testMode: true, // 设置为 true 来使用模拟数据，false 来调用 API
       profile: null,
       profileError: null,
       games: [],
@@ -180,128 +176,118 @@ export default {
       isTopBarExpanded: false, 
     };
   },
- //组件测试
-//  data() {
-//     return {
-//       // --- 模拟的 profile 数据 ---
-//       profile: {
-//         id: 'user_12345',
-//         username: 'DeepChessPlayer',
-//         email: 'player@example.com',
-//         createdAt: '2024-01-15T10:30:00Z', // ISO 8601 格式的日期时间字符串
-//         stats: {
-//           totalGames: 150,
-//           wins: 90,
-//           losses: 45,
-//           draws: 15,
-//           winRate: 0.60 // 胜率 (0-1 之间的小数)
-//         }
-//       },
-//       profileError: null,
-
-//       // --- 模拟的 games 数据（游戏历史列表） ---
-//       games: [
-//         {
-//           gameId: 'game_abc001',
-//           opponent: 'AI_Master',
-//           date: '2024-07-09T14:20:00Z',
-//           result: 'win', // 'win', 'loss', 'draw'
-//           duration: 3600, // 秒
-//           userColor: 'white' // 'white' or 'black'
-//         },
-//         {
-//           gameId: 'game_def002',
-//           opponent: 'RookieBot',
-//           date: '2024-07-08T18:05:00Z',
-//           result: 'loss',
-//           duration: 2400,
-//           userColor: 'black'
-//         },
-//         {
-//           gameId: 'game_ghi003',
-//           opponent: 'ChessGuru',
-//           date: '2024-07-07T09:45:00Z',
-//           result: 'draw',
-//           duration: 4000,
-//           userColor: 'white'
-//         },
-//          {
-//           gameId: 'game_jkl004',
-//           opponent: 'Tactician',
-//           date: '2024-07-06T11:10:00Z',
-//           result: 'win',
-//           duration: 2800,
-//           userColor: 'black'
-//         },
-//            {
-//           gameId: 'game_jkl005',
-//           opponent: 'Tactician',
-//           date: '2024-07-06T11:10:00Z',
-//           result: 'win',
-//           duration: 2800,
-//           userColor: 'black'
-//         }
-//       ],
-
-//       // --- 模拟的 pagination 数据 ---
-//       pagination: {
-//         page: 1,
-//         limit: 20, // 假设每页显示 20 项，我们只有 4 项
-//         total: 4, // 总共有 4 场游戏
-//         totalPages: 1, // 4 / 20 = 0.2，向上取整为 1 页
-//         hasNext: false,
-//         hasPrev: false,
-//       },
-//       sort: 'result_win',
-//       limit: 20,
-//       historyError: null,
-
-//       // --- 模拟的 selectedGameDetails 数据 (当点击某局游戏时显示) ---
-//       selectedGameDetails: null, // 初始为 null，点击游戏项后才会被填充
-//       //示例填充数据 (你可以将其设置为初始值来测试详情页面)
-//       selectedGameDetails: {
-//         gameId: 'game_abc001',
-//         moves: ['e4', 'e5', 'Nf3', 'Nc6', 'Bb5', 'a6'],
-//         boardStates: [
-//           'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-//           'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1',
-//           // ... 更多棋盘状态字符串
-//         ],
-//         gameId: 'game_abc004',
-//         moves: ['e4', 'e5', 'Nf3', 'Nc6', 'Bb5', 'a6'],
-//         boardStates: [
-//           'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-//           'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1',
-//           // ... 更多棋盘状态字符串
-//         ],
-//         timestamps: [
-//           '2024-07-09T14:20:00Z',
-//           '2024-07-08T14:20:10Z',
-//           '2024-07-01T14:20:25Z',
-//           '2024-07-02T14:20:40Z',
-//           '2024-07-03T14:20:55Z',
-//           '2024-07-04T14:21:10Z',
-//         ],
-//         comments: [
-//           { userComment: '开局不错', aiComment: '最佳开局。' },
-//           { userComment: '', aiComment: '不错的应对。' },
-//           null, // 可以是 null 如果没有评论
-//           { userComment: '犯了个错误', aiComment: '一个次优着法。' },
-//           null,
-//           { userComment: '妙手', aiComment: '关键性一步。' }
-//         ],
-//         analysisComment: '这局棋开局稳健，中盘发生激烈对抗，最终抓住对手失误获胜。'
-//       },
-//       gameDetailsError: null,
-//       isTopBarExpanded: false,
-//     };
-//   },
   created() {
-    // 组件创建后立即获取用户资料和历史对局
-    this.fetchProfile();
-    this.fetchHistory();
+    if (this.testMode) {
+      // 如果是测试模式，加载模拟数据
+      this.loadMockData();
+    } else {
+      // 否则，从 API 获取数据
+      this.fetchProfile();
+      this.fetchHistory();
+    }
   },
   methods: {
+    // 新增：加载模拟数据的方法
+    loadMockData() {
+      // --- 模拟的 profile 数据 ---
+      this.profile = {
+        id: 'user_12345',
+        username: 'DeepChessPlayer',
+        email: 'player@example.com',
+        createdAt: '2024-01-15T10:30:00Z',
+        stats: {
+          totalGames: 150,
+          wins: 90,
+          losses: 45,
+          draws: 15,
+          winRate: 0.60
+        }
+      };
+      this.profileError = null;
+
+      // --- 模拟的 games 数据（游戏历史列表） ---
+      this.games = [
+        {
+          gameId: 'game_abc001',
+          opponent: 'AI_Master',
+          date: '2024-07-09T14:20:00Z',
+          result: 'win',
+          duration: 3600,
+          userColor: 'white'
+        },
+        {
+          gameId: 'game_def002',
+          opponent: 'RookieBot',
+          date: '2024-07-08T18:05:00Z',
+          result: 'loss',
+          duration: 2400,
+          userColor: 'black'
+        },
+        {
+          gameId: 'game_ghi003',
+          opponent: 'ChessGuru',
+          date: '2024-07-07T09:45:00Z',
+          result: 'draw',
+          duration: 4000,
+          userColor: 'white'
+        },
+         {
+          gameId: 'game_jkl004',
+          opponent: 'Tactician',
+          date: '2024-07-06T11:10:00Z',
+          result: 'win',
+          duration: 2800,
+          userColor: 'black'
+        },
+           {
+          gameId: 'game_jkl005',
+          opponent: 'Tactician',
+          date: '2024-07-06T11:10:00Z',
+          result: 'win',
+          duration: 2800,
+          userColor: 'black'
+        }
+      ];
+
+      // --- 模拟的 pagination 数据 ---
+      this.pagination = {
+        page: 1,
+        limit: 20,
+        total: 5,
+        totalPages: 1,
+        hasNext: false,
+        hasPrev: false,
+      };
+      this.historyError = null;
+
+      // --- 模拟的 selectedGameDetails 数据 ---
+      this.selectedGameDetails = {
+        gameId: 'game_abc001',
+        moves: ['e4', 'e5', 'Nf3', 'Nc6', 'Bb5', 'a6'],
+        boardStates: [
+          'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+          'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1',
+        ],
+        timestamps: [
+          '2024-07-09T14:20:00Z',
+          '2024-07-08T14:20:10Z',
+          '2024-07-01T14:20:25Z',
+          '2024-07-02T14:20:40Z',
+          '2024-07-03T14:20:55Z',
+          '2024-07-04T14:21:10Z',
+        ],
+        comments: [
+          { userComment: '开局不错', aiComment: '最佳开局。' },
+          { userComment: '', aiComment: '不错的应对。' },
+          null,
+          { userComment: '犯了个错误', aiComment: '一个次优着法。' },
+          null,
+          { userComment: '妙手', aiComment: '关键性一步。' }
+        ],
+        analysisComment: '这局棋开局稳健，中盘发生激烈对抗，最终抓住对手失误获胜。'
+      };
+      this.gameDetailsError = null;
+    },
     // 处理评论组件的点击事件
    handleAnalysisUpdate({ comments }) {
   if (!this.selectedGameDetails) return;
@@ -508,7 +494,6 @@ async saveGameAnalysis() {
   display: flex;
   flex-direction: column; /* 垂直堆叠子元素 */
   min-height: 100vh; /* 最小高度为视口高度，确保页面始终占据一整屏 */
-  background-color: #2e4440; /* 页面背景色 */
 }
 
 /* 内容包裹器，用于根据 TopBar 状态调整自身位置 */
@@ -518,6 +503,7 @@ async saveGameAnalysis() {
   transition: padding-top 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* 顶部填充的平滑过渡动画 */
    overflow-y: auto; /* 允许垂直方向滚动条自动出现 */
   -webkit-overflow-scrolling: touch; /* 提高 iOS 设备上的滚动平滑度 */
+  display: flex; /* 使用 flex 布局来更好地控制子元素 */
 }
 
 /* 当 TopBar 展开或固定时，为内容包裹器添加的类，用于下移内容 */
@@ -533,7 +519,11 @@ async saveGameAnalysis() {
   padding: 20px;
   background-color: #697a71; 
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); /* 轻微阴影，增加层次感 */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); /* 轻微阴影，增加层次感 */ 
+  overflow-y: auto; /* 允许在容器内部垂直滚动 */
+  flex-grow: 1; /* 填充可用空间 */
+  min-height: 0; /* 在 flex 布局中允许收缩 */
+  max-height: calc(100vh - 120px); /* 设置最大高度，减去顶部padding和margin */
 }
 
 /* 页面头部样式 */
@@ -595,7 +585,7 @@ h2 {
 
 .profile-value {
   font-weight: 600;
-  color: #e7e9eb;
+  color: #000000;
 }
 
 .stats-grid {
@@ -662,7 +652,7 @@ h2 {
 }
 
 .filter-select {
-  padding: 10px 15px;
+  padding: 10px 20px;
   border: 1px solid #ced4da;
   border-radius: 6px;
   background-color: white;

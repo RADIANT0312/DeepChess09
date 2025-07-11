@@ -8,7 +8,7 @@
   >
     <img src="/sidebar-logo.svg" alt="DeepChess Logo" class="collapsed-logo" />
     <div class="side-bar-content">
-      <div class="header">
+      <div class="header" @mousedown.left="handleHeaderMouseDown">
         <div class="logo">
           <img src="/sidebar-logo.svg" alt="DeepChess Logo" width="50" height="50" />
         </div>
@@ -60,15 +60,6 @@ export default {
   emits: ['expansion-change'],
   computed: {
     sidebarStyle() {
-      if (this.isExpanded) {
-        return {
-          // Expanded styles remain fixed
-          top: '50%',
-          right: '15px',
-          transform: 'translateY(-50%)'
-        };
-      }
-      // Collapsed and draggable styles
       return {
         top: `${this.position.top}px`,
         right: `${this.position.right}px`,
@@ -79,7 +70,8 @@ export default {
   mounted() {
     this.startTimeUpdater();
     // Set initial position based on viewport
-    this.position.top = window.innerHeight * 0.1;
+    this.position.top = window.innerHeight * 0.05; // Start closer to top when expanded
+    this.position.right = 15; // Default right margin
   },
   beforeUnmount() {
     if (this.timeInterval) {
@@ -111,6 +103,13 @@ export default {
       this.startDrag(event);
     },
 
+    handleHeaderMouseDown(event) {
+      // Allow dragging from header when expanded
+      if (this.isExpanded) {
+        this.startDrag(event);
+      }
+    },
+
     startDrag(event) {
       this.isDragging = true;
       
@@ -128,8 +127,15 @@ export default {
       // Prevent text selection while dragging
       event.preventDefault();
 
-      this.position.top = event.clientY - this.dragStartOffset.y;
-      this.position.right = window.innerWidth - (event.clientX - this.dragStartOffset.x + this.$el.offsetWidth);
+      const newTop = event.clientY - this.dragStartOffset.y;
+      const newRight = window.innerWidth - (event.clientX - this.dragStartOffset.x + this.$el.offsetWidth);
+      
+      // Boundary constraints
+      const maxTop = window.innerHeight - this.$el.offsetHeight;
+      const maxRight = window.innerWidth - this.$el.offsetWidth;
+      
+      this.position.top = Math.max(0, Math.min(newTop, maxTop));
+      this.position.right = Math.max(0, Math.min(newRight, maxRight));
     },
 
     stopDrag() {
@@ -201,6 +207,7 @@ export default {
 .side-bar.dragging {
   cursor: grabbing;
   transition: none; /* Disable transition while dragging for responsiveness */
+  user-select: none; /* Prevent text selection while dragging */
 }
 
 .side-bar:not(.expanded):not(.dragging):hover {
@@ -250,6 +257,8 @@ export default {
   padding: 0 24px;
   margin-bottom: 30px;
   min-height: 40px;
+  cursor: move; /* Add cursor to indicate draggable */
+  user-select: none; /* Prevent text selection during drag */
 }
 
 .logo {

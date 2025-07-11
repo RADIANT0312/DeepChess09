@@ -1,83 +1,121 @@
 <script>
-import TopBar from './topbar.vue';
-
 export default {
   name: 'Main',
-  components: {
-    MainTopBar: TopBar
+  data() {
+    return {
+      imageLoaded: false,
+    };
+  },
+  methods: {
+    onImageLoad() {
+      this.imageLoaded = true;
+    }
   }
 }
 </script>
 
 <template>
-  <div>
-    <MainTopBar>
-    </MainTopBar>
-
+  <div class="main-container">
+    <MainTopBar />
     <br />
-    <h1>Practice your chess skills.</h1>
-    <div class="main-image">
-      <img src="/public/polygon-background1061-final.jpg" alt="Chess" />
-    </div>
-    <div class="main-btn-group">
+    <!-- 只有图片加载完才显示 -->
+    <div class="vs-button" v-show="imageLoaded">
       <router-link to="/game">
-        <el-button class="main-btn" type="primary" plain>Start Chess Game</el-button>
+        <img
+          src="/polygon-ai-game.jpg"
+          alt="Chess"
+          @load="onImageLoad"
+        />
       </router-link>
-      <router-link to="/profile">
-        <el-button class="main-btn" type="primary" plain>Profile</el-button>
+    </div>
+    <h1 class="chess-title">Practice your chess skills!</h1>
+
+    <div class="teaching-button" v-show="imageLoaded">
+      <router-link to="/game">
+        <img
+          src="/polygon-ai-learning.jpg"
+          alt="Chess"
+          @load="onImageLoad"
+        />
       </router-link>
     </div>
   </div>
 </template>
 
 <style scoped>
-.main-btn-group {
-  display: flex;
-  gap: 24px;
-  margin-top: 32px;
-  justify-content: center;
+.main-container {
+  position: relative;
+  height: 100vh;
 }
-.main-btn-group a {
-  text-decoration: none;
-}
-.main-btn {
-  font-size: 1.5rem;
-  padding: 16px 40px;
-  border-radius: 12px;
-  font-weight: bold;
-  letter-spacing: 1px;
-  background: rgba(255,255,255,0.15);
-  color: #fff;
-  border: 1px solid rgba(255,255,255,0.3);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.10);
-  transition: all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
-}
-.main-btn:hover {
-  background: rgba(255,255,255,0.25);
-  color: #333;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.18);
-  transform: translateY(-2px);
-}
-h1 {
-  /* 调整水平位置：居中 */
-  text-align: center;
 
-  /* 或者左对齐 */
-  /* text-align: left; */
-
-  /* 调整上下外边距 */
-  margin-top: 100px;
-  margin-bottom: 40px;
-
-  /* 你还可以用 padding 调整内边距 */
-  /* padding-left: 20px; */
+/* 图片位置保持不变 */
+.vs-button {
+  position: absolute;
+  top: 50%;
+  left: 25%;
+  width: 600px; /* 固定宽度 */
+  transform: translate(-50%, -50%);
 }
-.main-image img {
-  width: 300px;
+
+.vs-button img {
+  display: block;
+  width: 100%;
   height: auto;
-  border-radius: 1px;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  transition: transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+
+.vs-button img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 45px rgba(0,0,0,0.5);
+}
+
+.chess-title {
+  text-align: center;
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.25);
+  margin-top: 80px;
+  margin-bottom: 40px;
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeInUp 1s ease-out forwards;
+  color: white;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.teaching-button {
+  position: absolute;
+  top: 50%;
+  left: 75%;
+  width: 600px; /* 固定宽度 */
+  transform: translate(-50%, -50%);
+}
+
+.teaching-button img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  transition: transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+
+.teaching-button img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 45px rgba(0,0,0,0.5);
 }
 
 </style>
+
 

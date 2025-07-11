@@ -1,16 +1,47 @@
 <template>
   <div id="app">
-    <router-view v-slot="{ Component, route }">
-      <transition name="fade" mode="out-in">
-        <component :is="Component" :key="route.path" />
-      </transition>
-    </router-view>
+    <!-- 全局 topbar，根据当前路由显示不同的 topbar -->
+    <component :is="currentTopbar" v-if="currentTopbar" />
+    
+    <!-- 页面内容区域，只有这部分参与动画 -->
+    <transition name="page-content" mode="out-in">
+      <router-view v-slot="{ Component, route }">
+        <div class="page-content" :key="route.path">
+          <component :is="Component" />
+        </div>
+      </router-view>
+    </transition>
   </div>
 </template>
 
 <script>
+import ProfileTopbar from './components/Profile/topbar.vue';
+import MainTopbar from './components/Main/topbar.vue';
+import GameTopbar from './components/Game/topbar.vue';
+
 export default {
-  name: 'App'
+  name: 'App',
+  components: {
+    ProfileTopbar,
+    MainTopbar,
+    GameTopbar
+  },
+  computed: {
+    // 根据当前路由确定要显示的 topbar
+    currentTopbar() {
+      const routeName = this.$route.name;
+      switch (routeName) {
+        case 'Profile':
+          return 'ProfileTopbar';
+        case 'Main':
+          return 'MainTopbar';
+        case 'Game':
+          return 'GameTopbar';
+        default:
+          return null;
+      }
+    }
+  }
 }
 </script>
 
@@ -22,33 +53,24 @@ export default {
   font-family: "Palatin Linotype", cursive;
 }
 
-/* 路由切换动画 */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s ease;
+/* 页面内容动画 - 只对内容区域应用动画，topbar 保持静态 */
+.page-content-enter-active,
+.page-content-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.fade-enter-from,
-.fade-leave-to {
+.page-content-enter-from {
   opacity: 0;
+  transform: translateY(20px);
 }
 
-/* 可选：添加缩放效果 */
-.fade-enter-active {
-  transition: all 0.5s ease;
-}
-
-.fade-leave-active {
-  transition: all 0.5s ease;
-}
-
-.fade-enter-from {
+.page-content-leave-to {
   opacity: 0;
-  transform: scale(0.9);
+  transform: translateY(-20px);
 }
 
-.fade-leave-to {
-  opacity: 0;
-  transform: scale(1.1);
+/* 页面内容容器 */
+.page-content {
+  min-height: calc(100vh - 60px); /* 减去 topbar 的大概高度 */
 }
 </style>
