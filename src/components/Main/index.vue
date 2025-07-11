@@ -22,7 +22,7 @@ export default {
     <div class="vs-button" v-show="imageLoaded">
       <router-link to="/game">
         <img
-          src="/polygon-background1061-final.jpg"
+          src="/polygon-ai-game.jpg"
           alt="Chess"
           @load="onImageLoad"
         />
@@ -33,7 +33,7 @@ export default {
     <div class="teaching-button" v-show="imageLoaded">
       <router-link to="/game">
         <img
-          src="/polygon-background1004-final.jpg"
+          src="/polygon-ai-learning.jpg"
           alt="Chess"
           @load="onImageLoad"
         />
