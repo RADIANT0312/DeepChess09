@@ -1,5 +1,5 @@
 <script>
-import MainTopBar from '../MainTopBar/maintopbar.vue';
+import MainTopBar from './maintopbar.vue';
 
 export default {
   name: 'Main',
@@ -13,6 +13,8 @@ export default {
   <div>
     <MainTopBar>
     </MainTopBar>
+
+    <br />
     <h1>Practice your chess skills.</h1>
     <div class="main-image">
       <img src="/public/polygon-background1061-final.jpg" alt="Chess" />
