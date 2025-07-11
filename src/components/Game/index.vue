@@ -9,23 +9,15 @@ export default {
     Board
   },
   data() {
-    return {
-      isSideBarExpanded: false
-    }
   },
   methods: {
-    handleSideBarExpansion(isExpanded) {
-      this.isSideBarExpanded = isExpanded;
-    }
   }
 }
 </script>
 <template>
   <div class="main">
-    <SideBar @expansion-change="handleSideBarExpansion" />
-    <div class="board-area" :style="{ 
-      '--side-bar-width': isSideBarExpanded ? '350px' : '0px'
-    }">
+    <SideBar />
+    <div class="board-area" >
         <Board />
     </div>
   </div>
@@ -40,6 +32,7 @@ export default {
 }
 .board-area {
     --top-bar-height: 60px;
+    --side-bar-width: 100px;
     display: flex;
     justify-content: center;
     align-items: center;
