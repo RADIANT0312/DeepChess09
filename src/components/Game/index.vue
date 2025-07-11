@@ -1,25 +1,19 @@
 <script>
-import TopBar from './topbar.vue';
 import SideBar from '@components/SideBar/index.vue';
 import Board from '@components/Board/index.vue';
 
 export default {
   name: 'Main',
   components: {
-    TopBar,
     SideBar,
     Board
   },
   data() {
     return {
-      isTopBarExpanded: false,
       isSideBarExpanded: false
     }
   },
   methods: {
-    handleTopBarExpansion(isExpanded) {
-      this.isTopBarExpanded = isExpanded;
-    },
     handleSideBarExpansion(isExpanded) {
       this.isSideBarExpanded = isExpanded;
     }
@@ -28,10 +22,8 @@ export default {
 </script>
 <template>
   <div class="main">
-    <TopBar @expansion-change="handleTopBarExpansion" />
     <SideBar @expansion-change="handleSideBarExpansion" />
     <div class="board-area" :style="{ 
-      '--top-bar-height': isTopBarExpanded ? '50px' : '10px',
       '--side-bar-width': isSideBarExpanded ? '350px' : '0px'
     }">
         <Board />
@@ -47,6 +39,7 @@ export default {
   background-color: #4f5442;
 }
 .board-area {
+    --top-bar-height: 60px;
     display: flex;
     justify-content: center;
     align-items: center;

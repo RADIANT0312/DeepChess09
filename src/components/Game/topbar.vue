@@ -1,5 +1,5 @@
 <template>
-  <BaseTopBar @expansion-change="emitExpansionChange">
+  <BaseTopBar @expansion-change="emitExpansionChange" fixed="true">
     <template #content>
       <div class="time-display">{{ currentTime }}</div>
     </template>
