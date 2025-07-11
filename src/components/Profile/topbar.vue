@@ -29,6 +29,7 @@
 
 <script>
 import BaseTopBar from '../BaseTopBar/index.vue';
+import { user } from '@/api';
 
 export default {
   name: 'ProfileTopBar',
@@ -66,26 +67,7 @@ export default {
       this.$router.push('/'); // 或者你想跳转的起始页面路径
     },
     async fetchAvatar() {
-      const fallback =
-        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABu0lEQVR4nO3ZsU3DMBBF0Xu5F9+gTk2DRKfk4iK2pXRE9K4GGLSVJvYrZkqCGxZkz4XOA7+h/ewrhEEIAAAAAAAAAAAAgPqjwVupP9edW+o/n/2l10fAvz/Lue4HGzXlzMq/Wb2oAgw6kJgFEl8LYlWLUyRxyK5AsUPJlCSHcyIUtjlCK3GRMhjHJZJ8vHAYJMOxXYp1QllXaiCShyw5Cah7EpBSqxKl2pTwq9DxCrvtdMFuShQO9hwJUisAqPVaxCajP8DZfWxgr9kUyzqMZ8G6tlmQ0NgG51Ktp9XqPT+vKyO8E0JWEo0csMo5Cah6GpBShxgrChkpJcL1CklQk5TPwZ3i7EFL3aKLfZa5nO+Lu0rc6AYzJhJoPN2whJUikBq8KnC4xCyS1Qk5QPAMpCLwwAAAB4/M5dFv+X+HZp3weAghvkzOKiR91BAAAAAAAAAAAAQHi7/4Brb5N0G8B+bwAAAABJRU5ErkJggg==';
-      try {
-        const res = await fetch('/api/user/avatar', {
-          headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('token')
-          }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          this.avatar = data.avatar.startsWith('data:image')
-            ? data.avatar
-            : 'data:image/png;base64,' + data.avatar;
-        } else {
-          this.avatar = fallback;
-        }
-      } catch (err) {
-        console.error('头像加载失败：', err);
-        this.avatar = fallback;
-      }
+      this.avatar = await user.getAvatar();
     }
   }
 }

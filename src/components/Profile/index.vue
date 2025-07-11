@@ -144,8 +144,8 @@
 </template>
 
 <script>
-import axios from 'axios';
-import comment from '@components/comment/index.vue'; // 导入评论组件
+import { user } from '../../api';
+import comment from '../comment/index.vue'; // 导入评论组件
 
 export default {
   name: 'ProfileIndex', // 组件名称
@@ -318,16 +318,9 @@ async saveGameAnalysis() {
   if (!this.selectedGameDetails || !this.selectedGameDetails.analysisComment) return;
   
   try {
-    await axios.post(
-      `/api/user/history/${this.selectedGameDetails.gameId}/analysis`,
-      {
-        comment: this.selectedGameDetails.analysisComment
-      },
-      {
-        headers: {
-          'Authorization': 'Bearer YOUR_AUTH_TOKEN'
-        }
-      }
+    await user.saveGameAnalysis(
+      this.selectedGameDetails.gameId,
+      this.selectedGameDetails.analysisComment
     );
   } catch (error) {
     console.error('保存复盘分析失败:', error);
@@ -346,12 +339,7 @@ async saveGameAnalysis() {
      */
     async fetchProfile() {
       try {
-        const response = await axios.get('/api/user/profile', {
-          headers: {
-            // !!! 重要：请替换为您的实际认证令牌 !!!
-            'Authorization': 'Bearer YOUR_AUTH_TOKEN' 
-          }
-        });
+        const response = await user.getProfile();
         this.profile = response.data;
       } catch (error) {
         if (error.response && error.response.status === 401) {
@@ -369,16 +357,10 @@ async saveGameAnalysis() {
     async fetchHistory() {
       try {
         this.historyError = null; // 清除之前的错误信息
-        const response = await axios.get('/api/user/history', {
-          params: {
-            page: this.pagination.page,
-            limit: this.limit,
-            sort: this.sort,
-          },
-          headers: {
-            // !!! 重要：请替换为您的实际认证令牌 !!!
-            //'Authorization': 'Bearer YOUR_AUTH_TOKEN' 
-          }
+        const response = await user.getHistory({
+          page: this.pagination.page,
+          limit: this.limit,
+          sort: this.sort,
         });
         this.games = response.data.games;
         this.pagination = response.data.pagination;
@@ -418,12 +400,7 @@ async saveGameAnalysis() {
       this.selectedGameDetails = null; // 清除之前的详情
       this.gameDetailsError = null; // 清除之前的错误
       try {
-        const response = await axios.get(`/api/user/history/${gameId}`, {
-          headers: {
-            // !!! 重要：请替换为您的实际认证令牌 !!!
-            //'Authorization': 'Bearer YOUR_AUTH_TOKEN'  
-          }
-        });
+        const response = await user.getGameDetails(gameId);
         // 确保有comments数组和analysisComment对象
         response.data.comments = response.data.comments || [];
         response.data.analysisComment = response.data.analysisComment || null;

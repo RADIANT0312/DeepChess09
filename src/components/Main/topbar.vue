@@ -29,6 +29,7 @@
 
 <script>
 import BaseTopBar from '../BaseTopBar/index.vue';
+import { user } from '@/api';
 
 export default {
   name: 'MainTopBar',
@@ -66,25 +67,7 @@ export default {
       this.$router.push('/'); // 或者你想跳转的起始页面路径
     },
     async fetchAvatar() {
-      const fallback = '/default-avatar.jpg';
-      try {
-        const res = await fetch('/api/user/avatar', {
-          headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('token')
-          }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          this.avatar = data.avatar.startsWith('data:image')
-            ? data.avatar
-            : 'data:image/png;base64,' + data.avatar;
-        } else {
-          this.avatar = fallback;
-        }
-      } catch (err) {
-        console.error('头像加载失败：', err);
-        this.avatar = fallback;
-      }
+      this.avatar = await user.getAvatar();
     }
   }
 }

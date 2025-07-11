@@ -52,7 +52,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { login, register } from '@/api/index.js';
+import { auth } from '@/api';
 
 const isLogin = ref(true);
 const router = useRouter();
@@ -79,7 +79,7 @@ const toggleForm = () => {
 
 const handleLogin = async () => {
   try {
-    const response = await login(loginForm.value);
+    const response = await auth.login(loginForm.value);
     localStorage.setItem('token', response.data.token);
     localStorage.setItem('user', JSON.stringify(response.data.user));
     router.push('/main');
@@ -97,7 +97,7 @@ const handleRegister = async () => {
     // The API documentation does not specify a registration endpoint.
     // I will use a placeholder endpoint '/api/auth/register'.
     // This should be replaced with the actual endpoint when available.
-    await register({
+    await auth.register({
       username: registerForm.value.username,
       password: registerForm.value.password,
     });
