@@ -8,16 +8,16 @@
 
         <div class="content-wrapper">
           <div class="icon-container">
-            <img :src="iconPath" :alt="outcomeType" class="outcome-icon" />
+            <img :src="avatar" :alt="outcomeType" class="outcome-icon" />
           </div>
           <h2 class="outcome-text">{{ message }}</h2>
-          <p class="sub-text">{{ subMessage }}</p>
+          <br />
 
           <div class="actions">
             <router-link to="/game">
             <button class="action-button rematch-button" @click="handleRematchClick">Rematch</button>
             </router-link>
-            <router-link to="/">
+            <router-link to="/main">
             <button class="action-button exit-button" @click="handleExitClick">Back to Lobby</button>
              </router-link>
           </div>
@@ -28,8 +28,7 @@
 </template>
 
 <script>
-// 移除不必要的导入，如 Element Plus 的 'ro'
-// import { ro } from 'element-plus/es/locales.mjs';
+import { user } from '../../api';
 
 export default {
   name: 'ChessOutcomeCelebration',
@@ -45,7 +44,8 @@ export default {
   data() {
     return {
       // 这是关键：使用 internalShow 作为组件内部的响应式数据，控制自身的可见性。
-      internalShow: true // 默认值为 true，表示组件被渲染时就可见
+      internalShow: true, // 默认值为 true，表示组件被渲染时就可见
+      avatar: '/default-avatar.jpg' // 添加头像数据
     };
   },
   computed: {
@@ -62,26 +62,14 @@ export default {
           return 'GAME OVER';
       }
     },
-    subMessage() {
-      switch (this.outcomeType) {
-        case 'win':
-          return 'You played exceptionally well!';
-        case 'lose':
-          return 'Better luck next time!';
-        case 'draw':
-          return 'A hard-fought battle!';
-        default:
-          return 'The game has concluded.';
-      }
-    },
-    iconPath() {
-      if (this.outcomeType) {
-        return `/images/icon-${this.outcomeType}.svg`;
-      }
-      return '';
-    }
+  },
+  mounted() {
+    this.fetchAvatar();
   },
   methods: {
+    async fetchAvatar() {
+      this.avatar = await user.getAvatar();
+    },
     // closeOverlay 方法现在直接修改 internalShow 数据
     closeOverlay() {
       this.internalShow = false; // 直接将 internalShow 设置为 false，组件就会从 DOM 中移除
@@ -128,10 +116,10 @@ export default {
   position: relative;
   width: 90%;
   max-width: 600px;
-  background-color: #222;
+  background-color: #364b3f;
   border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6),
-              0 0 15px rgba(0, 0, 0, 0.3) inset;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+              /* 0 0 15px rgba(224, 217, 217, 0.3) inset; */
   padding: 40px 20px;
   text-align: center;
   overflow: hidden;
@@ -174,8 +162,8 @@ export default {
 }
 
 .icon-container {
-  width: 120px;
-  height: 120px;
+  width: 100px;
+  height: 100px;
   margin: 0 auto 20px auto;
   display: flex;
   justify-content: center;
@@ -189,12 +177,17 @@ export default {
 .outcome-icon {
   width: 80px;
   height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
   filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
 }
 
 .outcome-text {
+  font-family: "Palatin Linotype", cursive;
+  font-style: normal;
   font-size: 3.5em;
   font-weight: bold;
+  color: white;
   letter-spacing: 5px;
   margin-bottom: 10px;
   text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.5);
@@ -202,23 +195,16 @@ export default {
 }
 
 .celebration-card.win .outcome-text {
-  color: #8bc34a;
+  /* color: #8bc34a; */
   text-shadow: 0 0 15px rgba(139, 195, 74, 0.8);
 }
 .celebration-card.lose .outcome-text {
-  color: #f44333;
+  /* color: #f44333; */
   text-shadow: 0 0 15px rgba(244, 67, 51, 0.8);
 }
 .celebration-card.draw .outcome-text {
-  color: #ffc107;
+  /* color: #ffc107; */
   text-shadow: 0 0 15px rgba(255, 193, 7, 0.8);
-}
-
-.sub-text {
-  font-size: 1.2em;
-  color: #ccc;
-  margin-bottom: 30px;
-  animation: content-fade-in 0.8s ease-out 0.6s forwards;
 }
 
 .actions {
@@ -229,13 +215,15 @@ export default {
 }
 
 .action-button {
-  background-color: #007bff;
+  font-family: "Palatin Linotype", cursive;
+  font-style: normal;
+  background-color: #1F2828;
   color: white;
   border: none;
   padding: 15px 30px;
   border-radius: 50px;
   cursor: pointer;
-  font-size: 1.1em;
+  font-size: 1.5em;
   font-weight: bold;
   transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
