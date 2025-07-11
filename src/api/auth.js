@@ -7,8 +7,8 @@ export const auth = {
   /**
    * 用户登录
    * @param {Object} credentials - 登录凭据
-   * @param {string} credentials.username - 用户名
-   * @param {string} credentials.password - 密码
+   * @param {string} credentials.username - 用户名，3-20字符，支持字母数字下划线
+   * @param {string} credentials.password - 密码，6-128字符
    * @returns {Promise} API 响应
    */
   login: (credentials) => {
@@ -16,19 +16,7 @@ export const auth = {
   },
 
   /**
-   * 用户注册
-   * @param {Object} userData - 用户数据
-   * @param {string} userData.username - 用户名
-   * @param {string} userData.email - 邮箱
-   * @param {string} userData.password - 密码
-   * @returns {Promise} API 响应
-   */
-  register: (userData) => {
-    return apiClient.post('/auth/register', userData);
-  },
-
-  /**
-   * 用户登出
+   * 用户登出，清除token
    * @returns {Promise} API 响应
    */
   logout: () => {
@@ -36,10 +24,10 @@ export const auth = {
   },
 
   /**
-   * 刷新 token
+   * 检查登录状态
    * @returns {Promise} API 响应
    */
-  refreshToken: () => {
-    return apiClient.post('/auth/refresh');
+  checkStatus: () => {
+    return apiClient.get('/start');
   }
 };

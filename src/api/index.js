@@ -60,7 +60,8 @@ apiClient.interceptors.response.use(
 export { auth } from './auth.js';
 export { user } from './user.js';
 export { game } from './game.js';
+export { teaching } from './teaching.js';
+export { replay } from './replay.js';
 
 // 导出 axios 实例供直接使用
 export default apiClient;
-// 192.168.201.106:8000

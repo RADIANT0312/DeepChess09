@@ -1,37 +1,36 @@
 import apiClient from './index.js';
 
 /**
- * 游戏相关 API
+ * 对弈游戏相关 API (game page1)
  */
 export const game = {
   /**
-   * 创建新游戏
+   * 创建新的对弈游戏，与AI对局
    * @param {Object} gameConfig - 游戏配置
-   * @param {string} gameConfig.opponent - 对手类型 (AI/player)
-   * @param {string} gameConfig.difficulty - 难度级别
-   * @param {string} gameConfig.timeControl - 时间控制
+   * @param {string} gameConfig.color - 用户执棋颜色 (white|black)
+   * @param {string} gameConfig.difficulty - AI难度等级 (easy|medium|hard)
+   *   - easy: 简单（约1200 ELO）
+   *   - medium: 中等（约1600 ELO）
+   *   - hard: 困难（约2000 ELO）
    * @returns {Promise} API 响应
    */
-  createGame: (gameConfig) => {
-    return apiClient.post('/game/create', gameConfig);
+  createMatch: (gameConfig) => {
+    return apiClient.post('/game/match', gameConfig);
   },
 
   /**
-   * 加入游戏
-   * @param {string} gameId - 游戏 ID
+   * 获取对局当前状态
+   * @param {string} gameId - 对局ID
    * @returns {Promise} API 响应
    */
-  joinGame: (gameId) => {
-    return apiClient.post(`/game/${gameId}/join`);
+  getGameState: (gameId) => {
+    return apiClient.get(`/game/${gameId}`);
   },
 
   /**
-   * 进行移动
-   * @param {string} gameId - 游戏 ID
-   * @param {Object} move - 移动数据
-   * @param {string} move.from - 起始位置
-   * @param {string} move.to - 目标位置
-   * @param {string} move.promotion - 升变棋子类型 (可选)
+   * 提交用户走法，返回AI应对
+   * @param {string} gameId - 对局ID
+   * @param {string} move - 走法，使用标准代数记号法，格式为{from}{to}，如"e2e4"
    * @returns {Promise} API 响应
    */
   makeMove: (gameId, move) => {
@@ -39,39 +38,11 @@ export const game = {
   },
 
   /**
-   * 获取游戏状态
-   * @param {string} gameId - 游戏 ID
-   * @returns {Promise} API 响应
-   */
-  getGameState: (gameId) => {
-    return apiClient.get(`/game/${gameId}/state`);
-  },
-
-  /**
-   * 认输
-   * @param {string} gameId - 游戏 ID
+   * 用户认输，结束对局
+   * @param {string} gameId - 对局ID
    * @returns {Promise} API 响应
    */
   resign: (gameId) => {
     return apiClient.post(`/game/${gameId}/resign`);
-  },
-
-  /**
-   * 提议和棋
-   * @param {string} gameId - 游戏 ID
-   * @returns {Promise} API 响应
-   */
-  offerDraw: (gameId) => {
-    return apiClient.post(`/game/${gameId}/draw`);
-  },
-
-  /**
-   * 接受/拒绝和棋提议
-   * @param {string} gameId - 游戏 ID
-   * @param {boolean} accept - 是否接受
-   * @returns {Promise} API 响应
-   */
-  respondToDraw: (gameId, accept) => {
-    return apiClient.post(`/game/${gameId}/draw/respond`, { accept });
   }
 };
