@@ -1,10 +1,10 @@
 <script>
-import MainTopBar from './maintopbar.vue';
+import TopBar from './topbar.vue';
 
 export default {
   name: 'Main',
   components: {
-    MainTopBar
+    MainTopBar: TopBar
   }
 }
 </script>

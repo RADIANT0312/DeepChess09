@@ -2,6 +2,10 @@
   <div class="top-bar" :class="{ 'expanded': isExpanded || isPinned || fixed }" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
     <div class="top-bar-content">
       <slot name="content"></slot>
+      <slot name="content2"></slot>
+      <slot name="content3"></slot>
+      <slot name="content4"></slot>
+      <slot name="content5"></slot>
       <div class="controls">
         <slot name="controls">
           <button class="pin-button" @click="togglePin" :class="{ 'pinned': isPinned }">
