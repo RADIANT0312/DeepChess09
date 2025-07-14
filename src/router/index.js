@@ -4,6 +4,7 @@ const Main = () => import('@/components/Main/index.vue');
 const Game = () => import('@/components/Game/index.vue');
 const Profile = () => import('@/components/Profile/index.vue');
 const Login = () => import('@/components/Login/index.vue');
+const ChooseGameOptions = () => import('@/components/SelectMode/ChooseGameOptions.vue');
 
 const routes = [
   {
@@ -16,7 +17,7 @@ const routes = [
     path: '/main',
     name: 'Main',
     component: Main,
-    // meta: { requiresAuth: true } // Requires authentication
+    meta: { requiresAuth: true } // Requires authentication
   },
   {
     path: '/start',
@@ -30,6 +31,13 @@ const routes = [
     meta: { requiresAuth: true } // Requires authentication
   },
   {
+    path: '/game/:mode/:gameId',
+    name: 'GameWithParams',
+    component: Game,
+    props: true,
+    meta: { requiresAuth: true } // Requires authentication
+  },
+  {
     path: '/profile',
     name: 'Profile',
     component: Profile,
@@ -40,6 +48,11 @@ const routes = [
     name: 'Login',
     component: Login,
     meta: { requiresGuest: true } // Only accessible to unauthenticated users
+  },
+  {
+    path: '/choose-options',
+    name: 'ChooseGameOptions',
+    component: ChooseGameOptions,
   }
 ];
 
