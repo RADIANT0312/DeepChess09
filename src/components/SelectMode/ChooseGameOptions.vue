@@ -65,8 +65,8 @@ export default {
         
         const { gameId } = response.data;
         
-        // 直接跳转到 API 游戏页面
-        window.location.href = `/game/game/${gameId}`;
+        // 跳转时带上 color 参数
+        window.location.href = `/game/game/${gameId}?color=${this.color}`;
       } catch (error) {
         console.error('创建游戏失败:', error);
         // 可以在这里添加错误提示

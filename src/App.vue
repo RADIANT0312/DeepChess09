@@ -4,13 +4,13 @@
     <component :is="currentTopbar" v-if="currentTopbar" />
     
     <!-- 页面内容区域，只有这部分参与动画 -->
-    <transition name="page-content" mode="out-in">
-      <router-view v-slot="{ Component, route }">
+    <router-view v-slot="{ Component, route }">
+      <transition name="page-content" mode="out-in">
         <div class="page-content" :key="route.path">
           <component :is="Component" />
         </div>
-      </router-view>
-    </transition>
+      </transition>
+    </router-view>
   </div>
 </template>
 

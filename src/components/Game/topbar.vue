@@ -1,5 +1,5 @@
 <template>
-  <BaseTopBar @expansion-change="emitExpansionChange" fixed="true">
+  <BaseTopBar @expansion-change="emitExpansionChange" :fixed="true">
     <template #content>
       <button 
         class="resign-button" 

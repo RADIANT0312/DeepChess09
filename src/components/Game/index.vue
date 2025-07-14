@@ -45,6 +45,7 @@ export default {
     // 从路由参数获取mode和gameId
     this.mode = this.$route.query.mode || this.$route.params.mode;
     this.gameId = this.$route.query.gameId || this.$route.params.gameId;
+    this.userColor = this.$route.query.color || '';
     
     console.log('Game组件初始化:', { mode: this.mode, gameId: this.gameId });
     
@@ -97,12 +98,14 @@ export default {
       const response = await game.getGameState(this.gameId);
       console.log('获取对弈状态1');
       const data = response.data;
+      console.log('[Game] getGameState data:', data);
       
       this.gameData = data;
       this.boardState = data.boardState;
       this.moves = data.moves || [];
       this.currentPlayer = data.currentPlayer;
-      this.userColor = data.userColor;
+      // 优先用 URL 里的 color，没有再用接口返回的
+      this.userColor = this.userColor || data.userColor;
       this.gameStatus = data.status;
       this.gameResult = data.result;
     },

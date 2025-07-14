@@ -13,6 +13,7 @@
   --color-shadow-lighter: #4f5442;
   --transition-ease: cubic-bezier(0.25, 1, 0.5, 1);
   --color-background: var(--color-black);
+  --stroke: #222;
 }
 
 button, hr, input {
@@ -171,3 +172,143 @@ body {
   overflow: hidden;
   transition: background-color 250ms ease-in-out;
 }
+
+/* 棋盘基础样式 */
+#view, #board {
+  width: fit-content;
+  margin: 0 auto;
+  padding: 0;
+  box-sizing: border-box;
+  overflow: visible;
+}
+#board {
+  width: var(--diameter-board, 85vmin);
+  height: var(--diameter-board, 85vmin);
+  margin: 0 auto;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 棋盘容器响应式 */
+.board {
+  display: flex;
+  flex-direction: column-reverse;
+  width: min(85vw, 85vh);
+  height: min(85vw, 85vh);
+  box-shadow: 0 0 0 8px #e0c48f, 0 0 0 32px #b58863;
+  border-radius: 12px;
+  margin: auto;
+  background: #f0d9b5;
+}
+
+.row {
+  display: flex;
+  width: 100%;
+  height: 12.5%;
+}
+
+.tile {
+  width: 12.5%;
+  height: 100%;
+  border: none;
+  padding: 0;
+  background: none;
+  position: relative;
+  transition: background 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tile.light {
+  background-color: #f0d9b5 !important;
+}
+.tile.dark {
+  background-color: #b58863 !important;
+}
+
+.tile:hover {
+  box-shadow: 0 0 0 4px #1d83e0;
+  z-index: 2;
+}
+
+.tile.selected,
+.tile.highlight-active {
+  box-shadow: 0 0 0 4px #1d83e0, 0 0 12px 4px #1d83e055;
+  z-index: 3;
+}
+
+.tile.highlight-move {
+  box-shadow: 0 0 0 4px #1d83e0, 0 0 8px 2px #1d83e055;
+}
+
+.tile.highlight-capture {
+  box-shadow: 0 0 0 4px tomato, 0 0 8px 2px #ff634755;
+}
+
+/* 棋子SVG自适应、阴影、动画 */
+.tile svg {
+  width: 80%;
+  height: 80%;
+  display: block;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+  transition: transform 0.2s cubic-bezier(0.25,1,0.5,1), filter 0.2s;
+}
+
+.tile svg.white, .tile svg .white {
+  fill: #fff !important;
+  stroke: #222 !important;
+  stroke-width: 2.5 !important;
+}
+.tile svg.black, .tile svg .black {
+  fill: #222 !important;
+  stroke: #fff !important;
+  stroke-width: 2.5 !important;
+}
+
+.tile svg:hover {
+  filter: drop-shadow(0 4px 12px #1d83e0cc);
+  transform: scale(1.08) rotate(-2deg);
+}
+
+.tile .piece.highlight-active svg {
+  animation: wobble 0.5s linear infinite;
+  stroke: #1d83e0;
+}
+
+.tile .piece.highlight-capture svg {
+  stroke: tomato;
+}
+
+@keyframes wobble {
+  0%, 50%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.1) rotate(-2deg); }
+  75% { transform: scale(1.1) rotate(2deg); }
+}
+
+.pieces {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.piece {
+  position: static;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+}
+
+.piece svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.tile.light { background: #f0d9b5; }
+.tile.dark { background: #b58863; }

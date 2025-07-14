@@ -14,13 +14,19 @@
     </template>
     <template #content3>
       <div class="controls">
-        <el-button
-          class="topbar-white-btn"
-          plain
-          @click="$router.push('/start')"
+        <button
+          class="resign-button"
+          @click.stop="handleResign"
+          :disabled="isResigning"
+          type="button"
         >
-          Back to Start Page
-        </el-button>
+          <span v-if="isResigning">
+            {{ mode === 'game' ? 'Resigning...' : 'Exiting...' }}
+          </span>
+          <span v-else>
+            {{ getButtonText() }}
+          </span>
+        </button>
       </div>
     </template>
   </BaseTopBar>
@@ -40,7 +46,9 @@ export default {
     return {
       currentDate: '',
       isPinned: false,
-      avatar: ''
+      avatar: '',
+      isResigning: false,
+      mode: 'game' // 'game' or 'start'
     }
   },
   emits: ['expansion-change'],
@@ -68,6 +76,17 @@ export default {
     },
     async fetchAvatar() {
       this.avatar = await user.getAvatar();
+    },
+    handleResign() {
+      this.isResigning = true;
+      // 模拟退出或重新开始
+      setTimeout(() => {
+        this.isResigning = false;
+        this.$router.push('/start'); // 重新开始
+      }, 2000); // 模拟退出/重新开始需要的时间
+    },
+    getButtonText() {
+      return this.mode === 'game' ? 'Back to Start Page' : 'Back to Start Page';
     }
   }
 }

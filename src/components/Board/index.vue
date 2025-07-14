@@ -2,7 +2,23 @@
   <div>
     <div class="board-container-with-teaching">
       <section id="view">
-        <div id="board" ref="boardElement"></div>
+        <div
+          id="board"
+          class="board"
+          :class="userColor.toLowerCase() === 'black' ? 'perspective-black' : 'perspective-white'"
+          v-if="boardState && Object.keys(boardState).length === 8"
+        >
+          <div v-for="row in rowOrder" :key="row" class="row">
+            <button
+              v-for="colIdx in colOrder"
+              :key="colIdx"
+              class="tile"
+              :class="getTileClass(row, colIdx)"
+              @click="handleTileClick(row, colIdx)"
+              v-html="getPieceSVG(row, colIdx)"
+            ></button>
+          </div>
+        </div>
       </section>
     </div>
   </div>
@@ -11,6 +27,41 @@
 <script>
 import { ChessEngine } from './utils/ChessEngine.js';
 import { game, teaching } from '@/api';
+
+// 新增：FEN解析函数
+function parseFEN(fen) {
+  const [position, turn] = fen.split(' ');
+  const rows = position.split('/');
+  const piecePositions = {};
+  const pieces = {};
+  const pieceMap = {
+    p: 'PAWN', n: 'KNIGHT', b: 'BISHOP', r: 'ROOK', q: 'QUEEN', k: 'KING'
+  };
+  for (let i = 0; i < 8; i++) {
+    let colIdx = 0;
+    for (const char of rows[i]) {
+      if (/\d/.test(char)) {
+        colIdx += parseInt(char);
+      } else {
+        const row = 8 - i;
+        const col = String.fromCharCode('A'.charCodeAt(0) + colIdx);
+        const id = col + row;
+        const player = char === char.toUpperCase() ? 'WHITE' : 'BLACK';
+        const type = pieceMap[char.toLowerCase()];
+        // 新增log
+        console.log('[parseFEN] row:', row, 'col:', col, 'char:', char, 'player:', player, 'type:', type);
+        piecePositions[id] = { active: true, row: String(row), col };
+        pieces[id] = new ChessEngine.Piece({ id, player, type });
+        colIdx++;
+      }
+    }
+  }
+  return {
+    pieces,
+    piecePositions,
+    turn: turn === 'w' ? 'WHITE' : 'BLACK'
+  };
+}
 
 export default {
   name: 'Board',
@@ -50,6 +101,10 @@ export default {
   },
   data() {
     return {
+      boardState: {},
+      pieces: {},
+      piecePositions: {},
+      turn: 'WHITE',
       gameId: null,
       lessonId: null,
       game: null,
@@ -60,25 +115,35 @@ export default {
       testMode: this.$route?.query?.test === '1' // URL参数test=1时启用本地测试
     };
   },
+  computed: {
+    rowOrder() {
+      const order = this.userColor && this.userColor.toLowerCase() === 'black'
+        ? [1,2,3,4,5,6,7,8]
+        : [8,7,6,5,4,3,2,1];
+      console.log('[Board] rowOrder value:', order, 'userColor:', this.userColor);
+      return order;
+    },
+    colOrder() {
+      // 始终返回 [0,1,2,3,4,5,6,7]，通过 visualToBoard 实现左右翻转
+      return [0,1,2,3,4,5,6,7];
+    }
+  },
   async mounted() {
+    console.log('[Board] mounted userColor:', this.userColor);
+    console.log('[Board] boardFEN:', this.boardFEN);
     this.difficulty = this.$route?.query?.difficulty || 'medium';
 
     if (this.testMode) {
       // 本地测试模式：只用本地引擎
       this.initLocalTestMode();
     } else {
-      // 使用父组件传递的数据初始化棋盘
-      if (this.boardFEN) {
-        this.initBoardFromFEN(this.boardFEN, this.userColor);
-      } else {
-        // 如果没有传递FEN，使用默认初始局面
-        this.initDefaultBoard();
-      }
+      // 不做初始化，等 watch 触发
     }
   },
   watch: {
     // 监听prop变化，更新棋盘状态
     boardFEN(newFEN) {
+      console.log('[Board] watch boardFEN:', newFEN);
       if (newFEN && !this.testMode) {
         this.initBoardFromFEN(newFEN, this.userColor);
       }
@@ -93,21 +158,32 @@ export default {
     }
   },
   methods: {
+    visualToBoard(row, colIdx) {
+      if (this.userColor.toLowerCase() === 'black') {
+        return {
+          row: 9 - row,
+          colIdx: 9 - colIdx
+        };
+      }
+      return { row, colIdx };
+    },
     initLocalTestMode() {
       const pieces = ChessEngine.Utils.getInitialPieces();
       const piecePositions = ChessEngine.Utils.getInitialPiecePositions();
-      this.game = new ChessEngine.Game(pieces, piecePositions, this.userColor.toUpperCase());
-      this.view = new ChessEngine.View(this.$refs.boardElement, this.game, this.userColor.toUpperCase());
-      this.view.element.onclick = this.handleLocalBoardClick;
+      this.pieces = pieces;
+      this.piecePositions = piecePositions;
+      this.turn = this.userColor.toUpperCase();
+      this.updateBoardState();
       this.selected = null;
     },
     
     initDefaultBoard() {
       const pieces = ChessEngine.Utils.getInitialPieces();
       const piecePositions = ChessEngine.Utils.getInitialPiecePositions();
-      this.game = new ChessEngine.Game(pieces, piecePositions, this.userColor.toUpperCase());
-      this.view = new ChessEngine.View(this.$refs.boardElement, this.game, this.userColor.toUpperCase());
-      this.view.element.onclick = this.isTimeout ? null : this.handleBoardClick;
+      this.pieces = pieces;
+      this.piecePositions = piecePositions;
+      this.turn = this.userColor.toUpperCase();
+      this.updateBoardState();
       this.selected = null;
     },
 
@@ -149,12 +225,11 @@ export default {
     
     // 用FEN初始化棋盘（这里只用初始布局，实际应写FEN转化）
     initBoardFromFEN(fen, color) {
-      // TODO: FEN转化为piecePositions，当前仅支持初始局面
-      const pieces = ChessEngine.Utils.getInitialPieces();
-      const piecePositions = ChessEngine.Utils.getInitialPiecePositions();
-      this.game = new ChessEngine.Game(pieces, piecePositions, color.toUpperCase());
-      this.view = new ChessEngine.View(this.$refs.boardElement, this.game, color.toUpperCase());
-      this.view.element.onclick = this.isTimeout ? null : this.handleBoardClick;
+      const { pieces, piecePositions, turn } = parseFEN(fen);
+      this.pieces = pieces;
+      this.piecePositions = piecePositions;
+      this.turn = turn;
+      this.updateBoardState();
       this.selected = null;
     },
     
@@ -250,6 +325,47 @@ export default {
       } catch (e) {
         alert('教学走子失败: ' + (e?.response?.data?.message || e.message));
       }
+    },
+
+    initBoard() {
+      // 默认初始局面
+      this.pieces = ChessEngine.Utils.getInitialPieces();
+      this.piecePositions = ChessEngine.Utils.getInitialPiecePositions();
+      this.turn = 'WHITE';
+      this.updateBoardState();
+    },
+    updateBoardState() {
+      // 生成 boardState: {1:{A:pieceId,...},...}
+      this.boardState = ChessEngine.Utils.getInitialBoardState();
+      for (const pieceId in this.piecePositions) {
+        const pos = this.piecePositions[pieceId];
+        if (pos.active) {
+          const { row, col } = pos;
+          if (!this.boardState[row]) this.boardState[row] = {};
+          this.boardState[row][col] = pieceId;
+        }
+      }
+    },
+    getPieceSVG(row, colIdx) {
+      const { row: realRow, colIdx: realColIdx } = this.visualToBoard(row, colIdx);
+      const colChar = String.fromCharCode('A'.charCodeAt(0) + realColIdx);
+      const rowObj = this.boardState && this.boardState[String(realRow)];
+      if (!rowObj) return '';
+      const pieceId = rowObj[colChar];
+      if (pieceId && this.pieces[pieceId]) {
+        // 新增：输出棋子归属和类型，便于调试底线棋子
+        console.log(`[Board] piece at visual row ${row}, col ${colIdx} (real row ${realRow}, col ${colChar}):`, this.pieces[pieceId]);
+        return this.pieces[pieceId].shape();
+      }
+      return '';
+    },
+    getTileClass(row, colIdx) {
+      const { row: realRow, colIdx: realColIdx } = this.visualToBoard(row, colIdx);
+      return (realRow + realColIdx) % 2 === 0 ? 'light' : 'dark';
+    },
+    handleTileClick(row, colIdx) {
+      const { row: realRow, colIdx: realColIdx } = this.visualToBoard(row, colIdx);
+      // TODO: 保持原有点击逻辑，可根据需要补充
     }
   }
 };

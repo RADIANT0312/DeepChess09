@@ -29,5 +29,16 @@ export const auth = {
    */
   checkStatus: () => {
     return apiClient.get('/start');
+  },
+
+  /**
+   * 用户注册
+   * @param {Object} credentials - 注册信息
+   * @param {string} credentials.username - 用户名
+   * @param {string} credentials.password - 密码
+   * @returns {Promise} API 响应
+   */
+  register: (credentials) => {
+    return apiClient.post('/auth/register', credentials);
   }
 };

@@ -73,22 +73,23 @@ class Utils {
         return boardPieces;
     }
     static getInitialBoardTiles(parent, handler) {
-        const tiles = { 1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {} };
-        const board = document.createElement("div");
-        board.className = "board";
-        parent.appendChild(board);
+        const tiles = {};
         for (let i = 0; i < 8; i++) {
-            const row = document.createElement("div");
-            row.className = "row";
-            board.appendChild(row);
+            const row = 8 - i;
+            tiles[row] = {};
             for (let j = 0; j < 8; j++) {
+                const col = String.fromCharCode('A'.charCodeAt(0) + j);
                 const tile = document.createElement("button");
                 tile.className = "tile";
-                const r = Utils.intToRow(i);
-                const c = Utils.intToCol(j);
-                tile.addEventListener("click", () => handler({ row: r, col: c }));
-                row.appendChild(tile);
-                tiles[r][c] = tile;
+                // 动态加dark/light类
+                if ((i + j) % 2 === 1) {
+                    tile.classList.add('dark');
+                } else {
+                    tile.classList.add('light');
+                }
+                tile.addEventListener("click", () => handler({ row: String(row), col }));
+                parent.appendChild(tile); // 直接append到.board
+                tiles[row][col] = tile;
             }
         }
         return tiles;
@@ -191,9 +192,10 @@ class Utils {
 
 class Shape {
     static shape(player, piece) {
-        return `<svg class="${player}" width="170" height="170" viewBox="0 0 170 170" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <use href="/chess-pieces.svg#${piece}" />
-    </svg>`;
+        // 保证class为white或black
+        return `<svg class="${player.toLowerCase()}" width="170" height="170" viewBox="0 0 170 170" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <use xlink:href="/chess-pieces.svg#${piece}" />
+</svg>`;
     }
     static shapeBishop(player) {
         return Shape.shape(player, "bishop");
@@ -482,17 +484,17 @@ class Piece {
         const player = this.data.player.toLowerCase();
         switch (this.data.type) {
             case "BISHOP":
-                return Shape.shapeBishop(player);
+                return Shape.shape(player, "bishop");
             case "KING":
-                return Shape.shapeKing(player);
+                return Shape.shape(player, "king");
             case "KNIGHT":
-                return Shape.shapeKnight(player);
+                return Shape.shape(player, "knight");
             case "PAWN":
-                return Shape.shapePawn(player);
+                return Shape.shape(player, "pawn");
             case "QUEEN":
-                return Shape.shapeQueen(player);
+                return Shape.shape(player, "queen");
             case "ROOK":
-                return Shape.shapeRook(player);
+                return Shape.shape(player, "rook");
         }
     }
 }
@@ -844,73 +846,34 @@ class View {
         this.game = game;
         this.setPerspective(perspective || this.game.turn);
         this.tiles = Utils.getInitialBoardTiles(this.element, this.handleTileClick.bind(this));
-        this.pieces = Utils.getInitialBoardPieces(this.element, this.game.board.pieces);
         this.drawPiecePositions();
     }
     drawActivePiece(activePieceId) {
         const { row, col } = this.game.board.piecePositions[activePieceId];
         this.tiles[row][col].classList.add("highlight-active");
-        this.pieces[activePieceId].classList.add("highlight-active");
+        this.tiles[row][col].querySelector(".piece").classList.add("highlight-active");
     }
     drawCapturedPiece(capturedPieceId) {
-        const piece = this.pieces[capturedPieceId];
+        const piece = this.game.board.pieces[capturedPieceId];
+        const tileElement = this.tiles[Utils.rowToInt(piece.data.row)][Utils.colToInt(piece.data.col)];
         piece.style.setProperty("--transition-delay", "var(--transition-duration)");
         piece.style.removeProperty("--pos-col");
         piece.style.removeProperty("--pos-row");
         piece.style.setProperty("--scale", "0");
+        tileElement.querySelector(".piece").style.setProperty("--scale", "0");
     }
-    drawPiecePositions(moves = [], moveInner = "") {
-        document.body.style.setProperty("--color-background", `var(--color-${this.game.turn.toLowerCase()}`);
-        const other = this.game.turn === "WHITE" ? "turn-black" : "turn-white";
-        const current = this.game.turn === "WHITE" ? "turn-white" : "turn-black";
-        this.element.classList.add(current);
-        this.element.classList.remove(other);
-        if (moves.length) {
-            this.element.classList.add("touching");
-        }
-        else {
-            this.element.classList.remove("touching");
-        }
-        const key = (row, col) => `${row}-${col}`;
-        const moveKeys = moves.map(({ row, col }) => key(row, col));
-        this.game.board.tileEach(({ row, col }, piece, pieceMoves, pieceCaptures) => {
+    drawPiecePositions() {
+        // 直接在每个tile里渲染棋子SVG
+        this.game.board.tileEach(({ row, col }, piece) => {
             const tileElement = this.tiles[row][col];
-            const move = moveKeys.includes(key(row, col)) ? moveInner : "";
-            const format = (id, className) => this.game.board.pieces[id].shape();
-            tileElement.innerHTML = `
-        <div class="move">${move}</div>
-        <div class="moves">
-          ${this.game.board.tilesPiecesBlackMoves[row][col].map((id) => format(id, "black")).join("")}
-          ${this.game.board.tilesPiecesWhiteMoves[row][col].map((id) => format(id, "white")).join("")}
-        </div>
-        <div class="captures">
-          ${this.game.board.tilesPiecesBlackCaptures[row][col].map((id) => format(id, "black")).join("")}
-          ${this.game.board.tilesPiecesWhiteCaptures[row][col].map((id) => format(id, "white")).join("")}
-        </div>
-      `;
-            if (piece) {
-                tileElement.classList.add("occupied");
-                const pieceElement = this.pieces[piece.data.id];
-                pieceElement.style.setProperty("--pos-col", Utils.colToInt(col).toString());
-                pieceElement.style.setProperty("--pos-row", Utils.rowToInt(row).toString());
-                pieceElement.style.setProperty("--scale", "1");
-                pieceElement.classList[(pieceMoves === null || pieceMoves === void 0 ? void 0 : pieceMoves.length) ? "add" : "remove"]("can-move");
-                pieceElement.classList[(pieceCaptures === null || pieceCaptures === void 0 ? void 0 : pieceCaptures.length) ? "add" : "remove"]("can-capture");
-                if (piece.updateShape) {
-                    piece.updateShape = false;
-                    pieceElement.innerHTML = piece.shape();
-                }
-            }
-            else {
-                tileElement.classList.remove("occupied");
-            }
+            tileElement.innerHTML = piece ? piece.shape() : "";
         });
     }
     drawPositions(moves, captures) {
         moves === null || moves === void 0 ? void 0 : moves.forEach(({ row, col }) => {
             var _a, _b;
             this.tiles[row][col].classList.add("highlight-move");
-            (_b = this.pieces[(_a = this.game.board.tileFind({ row, col })) === null || _a === void 0 ? void 0 : _a.data.id]) === null || _b === void 0 ? void 0 : _b.classList.add("highlight-move");
+            (_b = this.game.board.tileFind({ row, col })) === null || _b === void 0 ? void 0 : _b.querySelector(".piece").classList.add("highlight-move");
         });
         captures === null || captures === void 0 ? void 0 : captures.forEach(({ row, col, capture }) => {
             var _a, _b;
@@ -919,7 +882,7 @@ class View {
                 col = capture.col;
             }
             this.tiles[row][col].classList.add("highlight-capture");
-            (_b = this.pieces[(_a = this.game.board.tileFind({ row, col })) === null || _a === void 0 ? void 0 : _a.data.id]) === null || _b === void 0 ? void 0 : _b.classList.add("highlight-capture");
+            (_b = this.game.board.tileFind({ row, col })) === null || _b === void 0 ? void 0 : _b.querySelector(".piece").classList.add("highlight-capture");
         });
     }
     drawResetClassNames() {
@@ -933,7 +896,7 @@ class View {
         if (type === "TOUCH") {
             const enPassant = captures.find((capture) => !!capture.capture);
             const passingMoves = enPassant ? moves.concat([enPassant]) : moves;
-            this.drawPiecePositions(passingMoves, this.game.board.pieces[activePieceId].shape());
+            this.drawPiecePositions();
         }
         else {
             this.drawPiecePositions();
