@@ -26,36 +26,54 @@
         </select>
       </div>
       <div class="choose-options-actions">
-        <button class="color-btn notready" @click="goToMain">I'm not ready</button>
-        <button class="color-btn confirm" :disabled="!color" @click="startGame">Start Game</button>
+        <button class="color-btn notready" @click="goToMain" :disabled="isCreatingGame">I'm not ready</button>
+        <button class="color-btn confirm" :disabled="!color || isCreatingGame" @click="startGame">
+          {{ isCreatingGame ? 'Creating Game...' : 'Start Game' }}
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { game } from '@/api/game.js';
+
 export default {
   name: 'ChooseGameOptions',
   data() {
     return {
       color: '',
       difficulty: 'medium',
+      isCreatingGame: false, // 添加loading状态
     };
   },
   methods: {
     goToMain() {
       this.$router.push('/main');
     },
-    startGame() {
-      // 跳转到 /game，带上mode、color、difficulty参数
-      this.$router.push({
-        path: '/game',
-        query: {
-          mode: this.$route.query.mode || 'game',
+    async startGame() {
+      if (this.isCreatingGame) return; // 防止重复点击
+      
+      this.isCreatingGame = true;
+      
+      try {
+        // 调用 API 创建游戏
+        const response = await game.createMatch({
           color: this.color,
           difficulty: this.difficulty
-        }
-      });
+        });
+        
+        const { gameId } = response.data;
+        
+        // 直接跳转到 API 游戏页面
+        window.location.href = `/game/game/${gameId}`;
+      } catch (error) {
+        console.error('创建游戏失败:', error);
+        // 可以在这里添加错误提示
+        alert('创建游戏失败，请重试');
+      } finally {
+        this.isCreatingGame = false;
+      }
     }
   }
 }
