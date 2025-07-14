@@ -100,7 +100,7 @@
           <p v-else class="no-data-message">No game history available.</p>
         </section>
 
-        <section v-if="selectedGameDetails" class="game-details-section card">
+        <!-- <section v-if="selectedGameDetails" class="game-details-section card">
           <h2 class="section-title">Game Replay (ID: {{ selectedGameDetails.gameId }})</h2>
           <button @click="selectedGameDetails = null" class="close-details-button">Close Details</button>
 
@@ -137,25 +137,23 @@
             </div>
           </div>
           <p v-else-if="gameDetailsError" class="error-message">{{ gameDetailsError }}</p>
-        </section>
+        </section> -->
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { user } from '../../api';
-import comment from '../comment/index.vue'; // 导入评论组件
+import { user } from '@/api';
 
 export default {
   name: 'ProfileIndex', // 组件名称
   components: {
-    comment // 注册评论组件
   },
   data() {
     return {
       // 添加一个开关来控制是否使用模拟数据
-      testMode: true, // 设置为 true 来使用模拟数据，false 来调用 API
+      testMode: false, // 设置为 true 来使用模拟数据，false 来调用 API
       profile: null,
       profileError: null,
       games: [],
