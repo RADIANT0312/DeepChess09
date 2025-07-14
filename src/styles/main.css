@@ -9,8 +9,8 @@
   --color-black: #222;
   --color-board-hue: 30;
   --color-board-sat: 40%;
-  --color-shadow: hsl(var(--color-board-hue), var(--color-board-sat), 50%);
-  --color-shadow-lighter: hsl(var(--color-board-hue), var(--color-board-sat), 55%);
+  --color-shadow: #4f5442;
+  --color-shadow-lighter: #4f5442;
   --transition-ease: cubic-bezier(0.25, 1, 0.5, 1);
   --color-background: var(--color-black);
 }
@@ -73,7 +73,7 @@ dfn {
 	font-style: italic
 }
 mark {
-	background-color: #ff0;
+	background-color: #000;
 	color: #000
 }
 small {
@@ -167,7 +167,7 @@ body {
 }
 
 body {
-  background: var(--color-shadow);
+  background-color: #4f5442;
   overflow: hidden;
   transition: background-color 250ms ease-in-out;
 }
