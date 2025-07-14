@@ -20,7 +20,7 @@ export default {
     <br />
     <!-- 只有图片加载完才显示 -->
     <div class="vs-button" v-show="imageLoaded">
-      <router-link to="/game">
+      <router-link :to="{ path: '/choose-options', query: { mode: 'game' } }">
         <img
           src="/polygon-ai-game.jpg"
           alt="Chess"
@@ -31,7 +31,7 @@ export default {
     <h1 class="chess-title">Practice your chess skills!</h1>
 
     <div class="teaching-button" v-show="imageLoaded">
-      <router-link to="/game">
+      <router-link :to="{ path: '/choose-options', query: { mode: 'teaching' } }">
         <img
           src="/polygon-ai-learning.jpg"
           alt="Chess"
