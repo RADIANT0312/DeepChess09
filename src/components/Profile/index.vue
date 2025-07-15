@@ -3,19 +3,26 @@
     <div class="content-wrapper" :class="{ 'shifted': true }">
       <div class="user-center-container">
         <header class="user-center-header">
-          <h1>Your Profile</h1>
+          <h1>{{ profile.username }}</h1>
         </header>
 
         <section class="profile-section card">
-          <h2>My Profile</h2>
+          <h2>Basic Information</h2>
           <div v-if="profile" class="profile-details">
             <p><strong>User ID:</strong> <span class="profile-value">{{ profile.id }}</span></p>
             <p><strong>Username:</strong> <span class="profile-value">{{ profile.username }}</span></p>
-            <p><strong>Email:</strong> <span class="profile-value">{{ profile.email }}</span></p>
+            <!-- <p><strong>Email:</strong> <span class="profile-value">{{ profile.email }}</span></p> -->
             <p><strong>Account Created At:</strong> <span class="profile-value">{{ formatDateTime(profile.createdAt)
                 }}</span></p>
 
-            <h3 class="section-sub-heading">Statistics</h3>
+          </div>
+          <p v-else-if="profileError" class="error-message">{{ profileError }}</p>
+          <p v-else class="loading-message">Loading profile...</p>
+        </section>
+
+        <section class="profile-section card">
+          <h2>Statistics</h2>
+          <div v-if="profile" class="profile-details">
             <div class="stats-grid">
               <div class="stat-item">
                 <span class="stat-label">Total Games:</span>
@@ -33,9 +40,17 @@
                 <span class="stat-label">Draws:</span>
                 <span class="stat-value draw">{{ profile.stats.draws }}</span>
               </div>
+            </div>
+            <div class="stats-grid">
               <div class="stat-item full-width">
                 <span class="stat-label">Win Rate:</span>
                 <span class="stat-value win-rate">{{ (profile.stats.winRate * 100).toFixed(2) }}%</span>
+              </div>
+            </div>
+            <div class="stats-grid">
+              <div class="stat-item full-width">
+                <span class="stat-label">Draw Rate:</span>
+                <span class="stat-value draw-rate">{{ (profile.stats.draws / profile.stats.totalGames * 100).toFixed(2) }}%</span>
               </div>
             </div>
           </div>
