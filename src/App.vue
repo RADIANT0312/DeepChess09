@@ -3,12 +3,16 @@
     <!-- 全局 topbar，根据当前路由显示不同的 topbar -->
     <component :is="currentTopbar" v-if="currentTopbar" />
 
-    <!-- 页面内容区域，只有这部分参与动画 -->
+    <!-- 页面内容区域 -->
     <router-view v-slot="{ Component, route }">
       <transition name="page-content" mode="out-in">
-        <div class="page-content" :key="route.path">
-          <component :is="Component" />
-        </div>
+        <!-- 
+          已修改：
+          1. 移除了外层的 div。
+          2. 将 :key 和 class 直接应用在 <component> 上。
+          这使得 Transition 直接作用于要切换的组件，结构更清晰，避免了竞态条件。
+        -->
+        <component :is="Component" :key="route.path" class="page-content" />
       </transition>
     </router-view>
   </div>
@@ -51,9 +55,11 @@ export default {
   height: 100vh;
   background-color: #4f5442;
   font-family: "Palatin Linotype";
+  /* 添加一个 overflow: hidden 可以防止在过渡期间出现滚动条 */
+  overflow: hidden;
 }
 
-/* 页面内容动画 - 只对内容区域应用动画，topbar 保持静态 */
+/* 页面内容动画 */
 .page-content-enter-active,
 .page-content-leave-active {
   transition: opacity 0.3s ease, transform 0.3s ease;
@@ -69,9 +75,11 @@ export default {
   transform: translateY(-20px);
 }
 
-/* 页面内容容器 */
+/* 页面内容容器样式 */
 .page-content {
-  min-height: calc(100vh - 60px);
+  min-height: calc(100vh - 60px); 
   /* 减去 topbar 的大概高度 */
+  /* 确保内容不会因为 position:absolute 的动画而塌陷 */
+  box-sizing: border-box;
 }
 </style>
