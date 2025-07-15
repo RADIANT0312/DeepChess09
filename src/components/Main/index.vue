@@ -104,14 +104,14 @@ export default {
     <br />
     <!-- 只有图片加载完才显示 -->
     <div class="vs-button" v-show="imageLoaded">
-      <router-link :to="{ path: '/choose-options', query: { mode: 'game' } }">
+      <router-link :to="{ path: '/select-mode', query: { mode: 'game' } }">
         <img src="/polygon-ai-game.jpg" alt="Chess" @load="onImageLoad" />
       </router-link>
     </div>
     <h1 class="chess-title">{{ dailyQuote }}</h1>
 
     <div class="teaching-button" v-show="imageLoaded">
-      <router-link :to="{ path: '/choose-options', query: { mode: 'teaching' } }">
+      <router-link :to="{ path: '/select-mode', query: { mode: 'teaching' } }">
         <img src="/polygon-ai-learning.jpg" alt="Chess" @load="onImageLoad" />
       </router-link>
     </div>

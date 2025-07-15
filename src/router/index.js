@@ -4,8 +4,7 @@ const Main = () => import("@/components/Main/index.vue");
 const Game = () => import("@/components/Game/index.vue");
 const Profile = () => import("@/components/Profile/index.vue");
 const Login = () => import("@/components/Login/index.vue");
-const ChooseGameOptions = () =>
-  import("@/components/SelectMode/ChooseGameOptions.vue");
+const SelectMode = () => import("@/components/SelectMode/index.vue");
 
 const routes = [
   {
@@ -51,9 +50,9 @@ const routes = [
     meta: { requiresGuest: true }, // Only accessible to unauthenticated users
   },
   {
-    path: "/choose-options",
-    name: "ChooseGameOptions",
-    component: ChooseGameOptions,
+    path: "/select-mode",
+    name: "SelectMode",
+    component: SelectMode,
   },
 ];
 
