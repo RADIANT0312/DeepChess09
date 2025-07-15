@@ -145,7 +145,7 @@ export default {
       this.timeoutTimer = setTimeout(() => {
         console.warn('页面操作超时');
         this.isTimeout = true;
-      }, 30000); // 30秒超时
+      }, 3000000); // 30秒超时
     },
     
     resetTimeout() {
@@ -206,17 +206,16 @@ export default {
         @game-resigned="handleGameResigned" 
       />
       <SideBar />
-      <div class="board-area">
+      <div v-if="!isLoading" class="board-area">
         <Board 
-          :boardFEN="this.boardState"
+          :gameId="gameId"
+          :boardState="this.boardState"
           :moves="this.moves"
           :currentPlayer="this.currentPlayer"
           :userColor="this.userColor"
           :gameStatus="this.gameStatus"
           :gameResult="this.gameResult"
           :mode="this.mode"
-          :isTimeout="isTimeout"
-          @user-interaction="handleUserInteraction"
         />
       </div>
       

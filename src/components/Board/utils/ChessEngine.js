@@ -839,9 +839,10 @@ class Game {
 }
 
 class View {
-    constructor(element, game, perspective) {
+    constructor(element, game, perspective, onMoveCallback = null) {
         this.element = element;
         this.game = game;
+        this.onMoveCallback = onMoveCallback;
         this.setPerspective(perspective || this.game.turn);
         this.tiles = Utils.getInitialBoardTiles(this.element, this.handleTileClick.bind(this));
         this.pieces = Utils.getInitialBoardPieces(this.element, this.game.board.pieces);
@@ -929,6 +930,7 @@ class View {
     }
     handleTileClick(location) {
         const { activePieceId, capturedPieceId, moves = [], captures = [], type } = this.game.activate(location);
+        console.log(`Tile clicked: ${activePieceId} at ${location.col}${location.row} (${type})`);
         this.drawResetClassNames();
         if (type === "TOUCH") {
             const enPassant = captures.find((capture) => !!capture.capture);
@@ -942,6 +944,18 @@ class View {
             return;
         }
         if (type === "MOVE" || type === "CAPTURE") {
+            // 创建移动记录
+            const moveRecord = `${activePieceId}${type === "CAPTURE" ? "x" : ""}${location.col}${location.row}`;
+
+            // 如果有回调函数，调用它；否则使用全局变量作为后备
+            if (this.onMoveCallback) {
+                this.onMoveCallback(moveRecord);
+            } else {
+                if (!window.moveHistory) {
+                    window.moveHistory = [];
+                }
+                window.moveHistory.push(moveRecord);
+            }
         }
         else {
             this.drawActivePiece(activePieceId);
