@@ -2,7 +2,7 @@
   <div class="choose-options-modal">
     <div class="choose-options-content">
       <h2>Choose Your Side</h2>
-      <p class="choose-options-desc">Please select the color you want to play. The AI will play the other side.</p>
+      <br />
       <div class="choose-options-btns">
         <button :class="['color-btn', 'white', { selected: color === 'white' }]" @click="color = 'white'">
           <span class="chess-svg">
@@ -41,11 +41,13 @@
 
 <script>
 import { game } from '@/api/game.js';
+import { teaching } from '@/api/teaching.js';
 
 export default {
   name: 'ChooseGameOptions',
   data() {
     return {
+      mode: this.$route.query.mode || 'game',
       color: '',
       difficulty: 'medium',
       isCreatingGame: false, // 添加loading状态
@@ -62,15 +64,17 @@ export default {
 
       try {
         // 调用 API 创建游戏
-        const response = await game.createMatch({
-          color: this.color,
-          difficulty: this.difficulty
-        });
+        const response = this.mode === 'teaching'
+          ? await game.createMatch({ color: this.color, difficulty: this.difficulty })
+          // TODO: 这里按理说应该是teaching.createTeaching, 或者getLessons获得一些课程的信息
+          // 但目前没有相关的API，所以暂时使用createMatch，因此当前版本下 game和teaching的创建逻辑是一样的
+          // 区别在于渲染时 game 不会渲染 ai comment, teaching 会
+          : await game.createMatch({ color: this.color, difficulty: this.difficulty });
 
         const { gameId } = response.data;
 
         // 直接跳转到 API 游戏页面
-        window.location.href = `/game/game/${gameId}`;
+        window.location.href = `/game/game/${gameId}?rmode=${this.mode}`;
       } catch (error) {
         console.error('创建游戏失败:', error);
         // 可以在这里添加错误提示
@@ -100,7 +104,7 @@ export default {
 }
 
 .choose-options-content {
-  background: #f8faf7;
+  background: #f7f7f788;
   border-radius: 18px;
   box-shadow: 0 8px 32px 0 rgba(54, 75, 63, 0.18);
   padding: 2.5em 2.5em 2em 2.5em;
@@ -164,14 +168,9 @@ export default {
   cursor: pointer;
 }
 
-.color-btn.selected {
-  border: 2.5px solid #1d83e0;
-  box-shadow: 0 0 0 2px #b6ffb0;
-}
-
 .color-btn.white .chess-svg svg circle {
-  fill: #fff;
-  stroke: #364b3f;
+  fill: #ffffff;
+  stroke: #000000;
   stroke-width: 2.5;
 }
 
@@ -183,8 +182,8 @@ export default {
 }
 
 .color-btn.black .chess-svg svg circle {
-  fill: #22382c;
-  stroke: #e0f5d8;
+  fill: #000000;
+  stroke: #ffffff;
   stroke-width: 2.5;
 }
 
@@ -193,10 +192,15 @@ export default {
 .color-btn.black:hover,
 .color-btn.black:focus {
   background: linear-gradient(180deg, #e6eae1 60%, #d2e0d2 100%);
-  color: #364b3f;
   border: 2px solid #22382c;
-  transform: translateY(-4px) scale(1.06);
+  transform: translateY(-4px) scale(1.2);
   box-shadow: 0 8px 32px 0 rgba(54, 75, 63, 0.13), 0 2px 16px 0 rgba(200, 220, 200, 0.10) inset;
+}
+
+.color-btn.black:hover,
+.color-btn.black:focus {
+  background: linear-gradient(180deg, #364b3f 60%, #364b3f 800%);
+  border: 2px solid #22382c;
 }
 
 .color-btn:active {
@@ -209,7 +213,6 @@ export default {
   align-items: center;
   gap: 1.2em;
   font-size: 1.13em;
-  background: #f8faf7;
   border-radius: 8px;
   padding: 0.7em 1.2em;
   box-shadow: 0 1px 6px 0 rgba(54, 75, 63, 0.06);
