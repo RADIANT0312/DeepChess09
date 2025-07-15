@@ -29,5 +29,13 @@ export const auth = {
    */
   checkStatus: () => {
     return apiClient.get('/start');
+  },
+
+  /**
+   * register
+   */
+  register: (userData) => {
+    return apiClient.post('/auth/register', userData);
   }
+
 };
