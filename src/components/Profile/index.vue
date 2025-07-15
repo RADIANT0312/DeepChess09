@@ -12,7 +12,8 @@
             <p><strong>User ID:</strong> <span class="profile-value">{{ profile.id }}</span></p>
             <p><strong>Username:</strong> <span class="profile-value">{{ profile.username }}</span></p>
             <p><strong>Email:</strong> <span class="profile-value">{{ profile.email }}</span></p>
-            <p><strong>Account Created At:</strong> <span class="profile-value">{{ formatDateTime(profile.createdAt) }}</span></p>
+            <p><strong>Account Created At:</strong> <span class="profile-value">{{ formatDateTime(profile.createdAt)
+                }}</span></p>
 
             <h3 class="section-sub-heading">Statistics</h3>
             <div class="stats-grid">
@@ -78,22 +79,21 @@
                 <div class="game-meta">
                   <span class="game-result" :class="game.result">{{ getResultText(game.result) }}</span>
                   <span class="game-duration">{{ formatDuration(game.duration) }}</span>
-                  <span class="game-color" :class="game.userColor">{{ game.userColor === 'white' ? 'White' : 'Black' }}</span>
-                  <button 
-                    @click.stop="analyzeGame(game.gameId)" 
-                    class="analyze-button"
-                    title="复盘分析"
-                    >
+                  <span class="game-color" :class="game.userColor">{{ game.userColor === 'white' ? 'White' : 'Black'
+                    }}</span>
+                  <button @click.stop="analyzeGame(game.gameId)" class="analyze-button" title="复盘分析">
                     review
-                    </button>
+                  </button>
                 </div>
               </li>
             </ul>
 
             <div class="pagination">
-              <button @click="changePage(pagination.page - 1)" :disabled="!pagination.hasPrev" class="pagination-button">Previous</button>
+              <button @click="changePage(pagination.page - 1)" :disabled="!pagination.hasPrev"
+                class="pagination-button">Previous</button>
               <span class="pagination-info">{{ pagination.page }} / {{ pagination.totalPages }}</span>
-              <button @click="changePage(pagination.page + 1)" :disabled="!pagination.hasNext" class="pagination-button">Next</button>
+              <button @click="changePage(pagination.page + 1)" :disabled="!pagination.hasNext"
+                class="pagination-button">Next</button>
             </div>
           </div>
           <p v-else-if="historyError" class="error-message">{{ historyError }}</p>
@@ -171,7 +171,7 @@ export default {
       selectedGameDetails: null,
       gameDetailsError: null,
       // 新增状态，用于控制内容区域的下移
-      isTopBarExpanded: false, 
+      isTopBarExpanded: false,
     };
   },
   created() {
@@ -229,7 +229,7 @@ export default {
           duration: 4000,
           userColor: 'white'
         },
-         {
+        {
           gameId: 'game_jkl004',
           opponent: 'Tactician',
           date: '2024-07-06T11:10:00Z',
@@ -237,7 +237,7 @@ export default {
           duration: 2800,
           userColor: 'black'
         },
-           {
+        {
           gameId: 'game_jkl005',
           opponent: 'Tactician',
           date: '2024-07-06T11:10:00Z',
@@ -287,44 +287,44 @@ export default {
       this.gameDetailsError = null;
     },
     // 处理评论组件的点击事件
-   handleAnalysisUpdate({ comments }) {
-  if (!this.selectedGameDetails) return;
-  
-  this.$set(this.selectedGameDetails, 'analysisComment', comments);
-  
-  // 自动保存到服务器
-  this.saveGameAnalysis();
-},
-analyzeGame(gameId) {
-  // 如果已经是当前选中游戏，则不再重复获取
-  if (this.selectedGameDetails && this.selectedGameDetails.gameId === gameId) {
-    return;
-  }
-  
-  this.fetchGameDetails(gameId);
-  
-  // 滚动到详情区域
-  this.$nextTick(() => {
-    const detailsSection = document.querySelector('.game-details-section');
-    if (detailsSection) {
-      detailsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  });
-},
+    handleAnalysisUpdate({ comments }) {
+      if (!this.selectedGameDetails) return;
 
-async saveGameAnalysis() {
-  if (!this.selectedGameDetails || !this.selectedGameDetails.analysisComment) return;
-  
-  try {
-    await user.saveGameAnalysis(
-      this.selectedGameDetails.gameId,
-      this.selectedGameDetails.analysisComment
-    );
-  } catch (error) {
-    console.error('保存复盘分析失败:', error);
-    this.$message.error('保存分析失败，请稍后重试');
-  }
-},
+      this.$set(this.selectedGameDetails, 'analysisComment', comments);
+
+      // 自动保存到服务器
+      this.saveGameAnalysis();
+    },
+    analyzeGame(gameId) {
+      // 如果已经是当前选中游戏，则不再重复获取
+      if (this.selectedGameDetails && this.selectedGameDetails.gameId === gameId) {
+        return;
+      }
+
+      this.fetchGameDetails(gameId);
+
+      // 滚动到详情区域
+      this.$nextTick(() => {
+        const detailsSection = document.querySelector('.game-details-section');
+        if (detailsSection) {
+          detailsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    },
+
+    async saveGameAnalysis() {
+      if (!this.selectedGameDetails || !this.selectedGameDetails.analysisComment) return;
+
+      try {
+        await user.saveGameAnalysis(
+          this.selectedGameDetails.gameId,
+          this.selectedGameDetails.analysisComment
+        );
+      } catch (error) {
+        console.error('保存复盘分析失败:', error);
+        this.$message.error('保存分析失败，请稍后重试');
+      }
+    },
     /**
      * 处理 TopBar 组件发出的展开状态变化事件。
      * @param {boolean} isExpanded - 如果 TopBar 展开或被固定，则为 true，否则为 false。
@@ -467,38 +467,54 @@ async saveGameAnalysis() {
 /* 主要布局容器，用于整体页面布局 */
 .main-layout {
   display: flex;
-  flex-direction: column; /* 垂直堆叠子元素 */
-  min-height: 100vh; /* 最小高度为视口高度，确保页面始终占据一整屏 */
+  flex-direction: column;
+  /* 垂直堆叠子元素 */
+  min-height: 100vh;
+  /* 最小高度为视口高度，确保页面始终占据一整屏 */
 }
 
 /* 内容包裹器，用于根据 TopBar 状态调整自身位置 */
 .content-wrapper {
-  flex-grow: 1; /* 允许内容区域填充可用空间 */
-  padding-top: 6px; /* 初始顶部填充，与折叠状态的 TopBar 高度一致 */
-  transition: padding-top 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* 顶部填充的平滑过渡动画 */
-   overflow-y: auto; /* 允许垂直方向滚动条自动出现 */
-  -webkit-overflow-scrolling: touch; /* 提高 iOS 设备上的滚动平滑度 */
-  display: flex; /* 使用 flex 布局来更好地控制子元素 */
+  flex-grow: 1;
+  /* 允许内容区域填充可用空间 */
+  padding-top: 6px;
+  /* 初始顶部填充，与折叠状态的 TopBar 高度一致 */
+  transition: padding-top 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* 顶部填充的平滑过渡动画 */
+  overflow-y: auto;
+  /* 允许垂直方向滚动条自动出现 */
+  -webkit-overflow-scrolling: touch;
+  /* 提高 iOS 设备上的滚动平滑度 */
+  display: flex;
+  /* 使用 flex 布局来更好地控制子元素 */
 }
 
 /* 当 TopBar 展开或固定时，为内容包裹器添加的类，用于下移内容 */
 .content-wrapper.shifted {
-  padding-top: 56px; /* 当 TopBar 展开时，下移内容区域的高度 */
+  padding-top: 56px;
+  /* 当 TopBar 展开时，下移内容区域的高度 */
 }
 
 /* 用户中心主要内容容器 (之前名为 .user-center-container) */
 .user-center-container {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  max-width: 960px; /* 最大宽度限制内容区域 */
-  margin: 30px auto; /* 自动左右居中，上下边距 30px */
+  max-width: 960px;
+  /* 最大宽度限制内容区域 */
+  margin: 30px auto;
+  /* 自动左右居中，上下边距 30px */
   padding: 20px;
-  background-color: #697a71; 
+  background-color: #697a71;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); /* 轻微阴影，增加层次感 */ 
-  overflow-y: auto; /* 允许在容器内部垂直滚动 */
-  flex-grow: 1; /* 填充可用空间 */
-  min-height: 0; /* 在 flex 布局中允许收缩 */
-  max-height: calc(100vh - 120px); /* 设置最大高度，减去顶部padding和margin */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  /* 轻微阴影，增加层次感 */
+  overflow-y: auto;
+  /* 允许在容器内部垂直滚动 */
+  flex-grow: 1;
+  /* 填充可用空间 */
+  min-height: 0;
+  /* 在 flex 布局中允许收缩 */
+  max-height: calc(100vh - 120px);
+  /* 设置最大高度，减去顶部padding和margin */
 }
 
 /* 页面头部样式 */
@@ -551,11 +567,13 @@ h2 {
   display: flex;
   justify-content: space-between;
   padding-bottom: 5px;
-  border-bottom: 1px dashed #d4d5d6; /* 虚线分隔 */
+  border-bottom: 1px dashed #d4d5d6;
+  /* 虚线分隔 */
 }
 
 .profile-details p:last-of-type {
-  border-bottom: none; /* 最后一行没有虚线 */
+  border-bottom: none;
+  /* 最后一行没有虚线 */
 }
 
 .profile-value {
@@ -565,7 +583,8 @@ h2 {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* 响应式网格布局 */
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  /* 响应式网格布局 */
   gap: 15px;
   margin-top: 20px;
 }
@@ -593,19 +612,32 @@ h2 {
 }
 
 /* 统计数据不同结果的颜色 */
-.stat-value.win { color: #28a745; } 
-.stat-value.loss { color: #dc3545; } 
-.stat-value.draw { color: #ffc107; } 
-.stat-value.win-rate { color: #007bff; } 
+.stat-value.win {
+  color: #28a745;
+}
+
+.stat-value.loss {
+  color: #dc3545;
+}
+
+.stat-value.draw {
+  color: #ffc107;
+}
+
+.stat-value.win-rate {
+  color: #007bff;
+}
 
 .stat-item.full-width {
-  grid-column: 1 / -1; /* 跨越所有列 */
+  grid-column: 1 / -1;
+  /* 跨越所有列 */
 }
 
 /* 筛选器样式 */
 .filters-container {
   display: flex;
-  flex-wrap: wrap; /* 允许换行 */
+  flex-wrap: wrap;
+  /* 允许换行 */
   gap: 20px;
   margin-bottom: 30px;
   background-color: #b8cdc7;
@@ -633,8 +665,10 @@ h2 {
   background-color: white;
   font-size: 0.95em;
   color: #333;
-  appearance: none; /* 移除默认的下拉箭头 */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236c757d'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); /* 自定义下拉箭头 */
+  appearance: none;
+  /* 移除默认的下拉箭头 */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236c757d'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  /* 自定义下拉箭头 */
   background-repeat: no-repeat;
   background-position: right 10px center;
   background-size: 1.2em;
@@ -706,21 +740,30 @@ h2 {
   background-color: #d4edda;
   color: #155724;
 }
+
 .game-result.loss {
   background-color: #f8d7da;
   color: #721c24;
 }
+
 .game-result.draw {
   background-color: #fff3cd;
   color: #856404;
 }
 
-.game-duration, .game-color {
+.game-duration,
+.game-color {
   font-size: 0.85em;
   color: #6c757d;
 }
-.game-color.white { color: #555; }
-.game-color.black { color: #333; }
+
+.game-color.white {
+  color: #555;
+}
+
+.game-color.black {
+  color: #333;
+}
 
 
 /* 分页器样式 */
@@ -765,7 +808,8 @@ h2 {
 
 /* 游戏详情部分样式 */
 .game-details-section {
-  position: relative; /* 用于定位关闭按钮 */
+  position: relative;
+  /* 用于定位关闭按钮 */
 }
 
 .close-details-button {
@@ -821,7 +865,7 @@ h2 {
 
 .move-comments {
   margin-top: 8px;
-  background-color: #f0f8ff; 
+  background-color: #f0f8ff;
   border-left: 4px solid #a0cffc;
   padding: 10px 15px;
   border-radius: 4px;
@@ -838,8 +882,8 @@ h2 {
 }
 
 .board-states-viewer {
-  background-color: #2b2b2b; 
-  color: #f8f8f2; 
+  background-color: #2b2b2b;
+  color: #f8f8f2;
   padding: 15px;
   border-radius: 8px;
   overflow-x: auto;
@@ -852,8 +896,8 @@ h2 {
   font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
   font-size: 0.9em;
   line-height: 1.5;
-  white-space: pre-wrap; 
-  word-break: break-all; 
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 
 .timestamp-list {
@@ -873,7 +917,8 @@ h2 {
 }
 
 /* 消息提示样式 */
-.loading-message, .no-data-message {
+.loading-message,
+.no-data-message {
   text-align: center;
   color: #6c757d;
   font-style: italic;
@@ -881,8 +926,8 @@ h2 {
 }
 
 .error-message {
-  color: #dc3545; 
-  background-color: #f8d7da; 
+  color: #dc3545;
+  background-color: #f8d7da;
   border: 1px solid #f5c6cb;
   padding: 15px;
   border-radius: 8px;
@@ -963,11 +1008,13 @@ h2 {
     font-size: 1.3em;
   }
 
-  .filter-select, .pagination-button {
+  .filter-select,
+  .pagination-button {
     font-size: 0.9em;
     padding: 8px 12px;
   }
 }
+
 /* 复盘按钮样式 */
 .analyze-button {
   background-color: #2196F3;
@@ -984,7 +1031,7 @@ h2 {
 .analyze-button:hover {
   background-color: #0b7dda;
   transform: translateY(-1px);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 /* 调整游戏元信息布局 */

@@ -1,4 +1,4 @@
-import apiClient from './index.js';
+import apiClient from "./index.js";
 
 /**
  * 教学相关 API (game page2)
@@ -9,7 +9,7 @@ export const teaching = {
    * @returns {Promise} API 响应
    */
   getLessons: () => {
-    return apiClient.get('/teaching/lessons');
+    return apiClient.get("/teaching/lessons");
   },
 
   /**
@@ -29,5 +29,5 @@ export const teaching = {
    */
   makeMove: (lessonId, move) => {
     return apiClient.post(`/teaching/${lessonId}/move`, { move });
-  }
+  },
 };

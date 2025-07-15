@@ -1,11 +1,6 @@
 <template>
-  <div 
-    class="side-bar" 
-    :class="{ 'expanded': isExpanded, 'dragging': isDragging }" 
-    :style="sidebarStyle"
-    @mousedown.left="handleMouseDown"
-    @contextmenu.prevent="expandSidebar"
-  >
+  <div class="side-bar" :class="{ 'expanded': isExpanded, 'dragging': isDragging }" :style="sidebarStyle"
+    @mousedown.left="handleMouseDown" @contextmenu.prevent="expandSidebar">
     <img src="/sidebar-logo.svg" alt="DeepChess Logo" class="collapsed-logo" />
     <div class="side-bar-content">
       <div class="header" @mousedown.left="handleHeaderMouseDown">
@@ -15,37 +10,29 @@
         <span class="brand-name" v-show="isExpanded">DeepChess</span>
       </div>
 
-      <div class="main-content-area"> 
-        <button 
-          class="AIbutton" 
-          style="font-style: italic;"
-          :class="{ 'active-button': activeWorkplace === 'history' }" 
-          @click="toggleWorkplace('history')"
-        >
-          History 
+      <div class="main-content-area">
+        <button class="AIbutton" style="font-style: italic;" :class="{ 'active-button': activeWorkplace === 'history' }"
+          @click="toggleWorkplace('history')">
+          History
         </button>
-        <button 
-          class="AIbutton" 
-          style="font-style: italic;"
-          :class="{ 'active-button': activeWorkplace === 'AIcomment' }" 
-          @click="toggleWorkplace('AIcomment')"
-        >
+        <button class="AIbutton" style="font-style: italic;"
+          :class="{ 'active-button': activeWorkplace === 'AIcomment' }" @click="toggleWorkplace('AIcomment')">
           AI Comment
         </button>
-        
-      <div class="workplace" v-show="activeWorkplace === 'history'">
+
+        <div class="workplace" v-show="activeWorkplace === 'history'">
           <h3>Game History:</h3>
           <p v-if="!gameId">No active game to show history for. Create a match first.</p>
           <p v-else-if="isLoadingHistory">Loading history...</p>
           <p v-else-if="historyError" class="error-message">{{ historyError }}</p>
           <div v-else-if="historyContent.length">
-            <p v-for="item in historyContent" :key="item.id"  class="work-word">
+            <p v-for="item in historyContent" :key="item.id" class="work-word">
               <strong>{{ item.move }}:</strong> {{ item.comment }}
             </p>
           </div>
           <p v-else>No game history available yet.</p>
         </div>
-        
+
         <div class="workplace" v-show="activeWorkplace === 'AIcomment'">
           <h3>AI Analysis:</h3>
           <p v-if="!gameId" class="work-word">No active game to show AI comments for. Create a match first.</p>
@@ -62,7 +49,7 @@
       <div class="footer">
         <button class="collapse-button" @click.stop="collapseSidebar" v-show="isExpanded">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
           </svg>
         </button>
       </div>
@@ -71,7 +58,7 @@
 </template>
 
 <script>
-import { user, game} from '@/api'; // Adjust the import path as necessary.
+import { user, game } from '@/api'; // Adjust the import path as necessary.
 export default {
   name: 'SideBarGame',
   props: {
@@ -99,7 +86,7 @@ export default {
       historyError: null,
     }
   },
-  emits: ['expansion-change','resign-game'],
+  emits: ['expansion-change', 'resign-game'],
   watch: {
     // 监听 currentGameId prop 的变化，更新组件内部的 gameId
     currentGameId(newId) {
@@ -107,7 +94,7 @@ export default {
       // 当 gameId 变化且有效时，重新加载数据
       if (newId) {
         // 每次 gameId 变化时，默认加载历史数据，并清空AI评论以便在切换时重新加载
-        this.fetchGameDetailsData(); 
+        this.fetchGameDetailsData();
       } else {
         // 如果没有 gameId，则清空数据和错误
         this.historyContent = [];
@@ -131,14 +118,14 @@ export default {
       return {
         top: `${this.position.top}px`,
         right: `${this.position.right}px`,
-        transform: 'translateY(0)' 
+        transform: 'translateY(0)'
       };
     }
   },
   mounted() {
     this.startTimeUpdater();
-    this.position.top = window.innerHeight * 0.05; 
-    this.position.right = 15; 
+    this.position.top = window.innerHeight * 0.05;
+    this.position.right = 15;
   },
   beforeUnmount() {
     if (this.timeInterval) {
@@ -157,10 +144,10 @@ export default {
 
     updateTime() {
       const now = new Date();
-      this.currentTime = now.toLocaleTimeString('en-US', { 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit' 
+      this.currentTime = now.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
       });
     },
 
@@ -177,7 +164,7 @@ export default {
 
     startDrag(event) {
       this.isDragging = true;
-      
+
       const rect = this.$el.getBoundingClientRect();
       this.dragStartOffset.x = event.clientX - rect.left;
       this.dragStartOffset.y = event.clientY - rect.top;
@@ -188,15 +175,15 @@ export default {
 
     onDrag(event) {
       if (!this.isDragging) return;
-      
+
       event.preventDefault();
 
       const newTop = event.clientY - this.dragStartOffset.y;
       const newRight = window.innerWidth - (event.clientX - this.dragStartOffset.x + this.$el.offsetWidth);
-      
+
       const maxTop = window.innerHeight - this.$el.offsetHeight;
       const maxRight = window.innerWidth - this.$el.offsetWidth;
-      
+
       this.position.top = Math.max(0, Math.min(newTop, maxTop));
       this.position.right = Math.max(0, Math.min(newRight, maxRight));
     },
@@ -245,13 +232,13 @@ export default {
 
       try {
         // 调用 user 模块的 getGameDetails 方法来获取特定对局的详细信息
-        const response = await user.getGameDetails(this.gameId); 
-        
+        const response = await user.getGameDetails(this.gameId);
+
         // 游戏历史: moves 数组
-        this.historyContent = response.data.moves || []; 
-        
+        this.historyContent = response.data.moves || [];
+
         // AI 评论: comments 数组
-        this.aiCommentContent = response.data.comments || []; 
+        this.aiCommentContent = response.data.comments || [];
 
         console.log('游戏详情数据获取成功:', response.data);
 
@@ -265,7 +252,7 @@ export default {
         this.isLoadingAIComment = false;
       }
     }
-     
+
   }
 }
 </script>
@@ -297,7 +284,7 @@ export default {
   cursor: pointer;
   overflow: hidden;
   border-radius: 10px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -308,18 +295,21 @@ export default {
 
 .side-bar.dragging {
   cursor: grabbing;
-  transition: none; /* Disable transition while dragging for responsiveness */
-  user-select: none; /* Prevent text selection while dragging */
+  transition: none;
+  /* Disable transition while dragging for responsiveness */
+  user-select: none;
+  /* Prevent text selection while dragging */
 }
 
 .side-bar:not(.expanded):not(.dragging):hover {
-  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
 }
 
 .side-bar.expanded {
   height: 90vh;
   width: 350px;
-  cursor: default; /* Change cursor back when expanded */
+  cursor: default;
+  /* Change cursor back when expanded */
 }
 
 .collapsed-logo {
@@ -340,13 +330,14 @@ export default {
 .side-bar-content {
   display: flex;
   flex-direction: column;
-  height: 95%; /* This refers to 95% of the .side-bar's height when expanded */
+  height: 95%;
+  /* This refers to 95% of the .side-bar's height when expanded */
   width: 350px;
   padding: 20px 0;
   opacity: 0;
   transform: translateX(10px);
   transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  box-sizing: border-box; 
+  box-sizing: border-box;
 }
 
 .side-bar.expanded .side-bar-content {
@@ -360,8 +351,8 @@ export default {
   padding: 0 24px;
   margin-bottom: 30px;
   min-height: 40px;
-  cursor: move; 
-  user-select: none; 
+  cursor: move;
+  user-select: none;
 }
 
 .logo {
@@ -379,26 +370,32 @@ export default {
 
 /* Styles for the main content area */
 .main-content-area {
-  flex-grow: 1; 
-  display: flex; 
-  flex-direction: column; 
-  padding-bottom: 20px; 
-  box-sizing: border-box; 
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 20px;
+  box-sizing: border-box;
   /* Important for hiding scrollbar but allowing scroll */
-  overflow-y: scroll; /* Allows content to scroll */
-  -ms-overflow-style: none; /* For Internet Explorer and Edge */
-  scrollbar-width: none; /* For Firefox */
+  overflow-y: scroll;
+  /* Allows content to scroll */
+  -ms-overflow-style: none;
+  /* For Internet Explorer and Edge */
+  scrollbar-width: none;
+  /* For Firefox */
 }
 
 /* For Chrome, Safari, and Opera */
 .main-content-area::-webkit-scrollbar {
-  display: none; /* Hide the scrollbar */
-  width: 0; /* Ensures no width is reserved */
-  height: 0; /* Ensures no height is reserved */
+  display: none;
+  /* Hide the scrollbar */
+  width: 0;
+  /* Ensures no width is reserved */
+  height: 0;
+  /* Ensures no height is reserved */
 }
 
 
-.nav-items { 
+.nav-items {
   flex-grow: 1;
 }
 
@@ -420,7 +417,7 @@ export default {
 }
 
 .nav-items li a:hover {
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   color: #fff;
 }
 
@@ -458,7 +455,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   min-height: 40px;
-  flex-shrink: 0; 
+  flex-shrink: 0;
 }
 
 .collapse-button {
@@ -466,8 +463,8 @@ export default {
   border: none;
   color: #e0e0e0;
   cursor: pointer;
-  padding:8px;
-  margin-left:250px;
+  padding: 8px;
+  margin-left: 250px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -476,7 +473,7 @@ export default {
 }
 
 .collapse-button:hover {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
   color: #fff;
 }
 
@@ -487,51 +484,55 @@ export default {
 
 /* AIbutton styles */
 .AIbutton {
-  width: calc(100% - 40px); 
-  height: 45px; /* Button height fixed */
-  background: #4a675e; 
+  width: calc(100% - 40px);
+  height: 45px;
+  /* Button height fixed */
+  background: #4a675e;
   color: #e0e0e0;
   border: none;
-  border-radius: 8px; 
+  border-radius: 8px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  margin: 10px 20px; 
+  margin: 10px 20px;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .AIbutton:hover {
-  background: #5c7e70; 
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); 
+  background: #5c7e70;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Active button styles */
 .AIbutton.active-button {
-  background: linear-gradient(90deg, #667eea, #764ba2); 
+  background: linear-gradient(90deg, #667eea, #764ba2);
   color: #fff;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); 
-  transform: translateY(-2px); 
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  transform: translateY(-2px);
 }
 
 /* Workplace styles */
 .workplace {
-  width: 280px; 
-  background: #2e3d37; 
-  border: 1px solid rgba(255, 255, 255, 0.08); 
+  width: 280px;
+  background: #2e3d37;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
-  margin: 15px 20px; 
-  padding: 15px; 
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2); 
-  color: #c0c0c0; 
+  margin: 15px 20px;
+  padding: 15px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+  color: #c0c0c0;
   font-size: 14px;
   line-height: 1.6;
-   /* 确保内部文本换行 */
-  word-wrap: break-word; /* 强制长单词或URL在达到容器边界时换行 */
-  overflow-wrap: break-word; /* 现代替代方案 */
-  white-space: normal; /* 确保不强制单行 */
+  /* 确保内部文本换行 */
+  word-wrap: break-word;
+  /* 强制长单词或URL在达到容器边界时换行 */
+  overflow-wrap: break-word;
+  /* 现代替代方案 */
+  white-space: normal;
+  /* 确保不强制单行 */
   /* Removed overflow-y and max-height from here as main-content-area handles it */
-  transition: all 0.5s ease-in-out; 
+  transition: all 0.5s ease-in-out;
 }
 
 .workplace h3 {
@@ -547,11 +548,11 @@ export default {
   margin-bottom: 10px;
 }
 
-.work-word{
- text-align:left;
- color:#889296;
- font-size: 14px;
- font-weight:500;
- font-style:italic;
+.work-word {
+  text-align: left;
+  color: #889296;
+  font-size: 14px;
+  font-weight: 500;
+  font-style: italic;
 }
 </style>

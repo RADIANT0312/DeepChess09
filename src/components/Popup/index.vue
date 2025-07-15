@@ -15,11 +15,11 @@
 
           <div class="actions">
             <router-link to="/game">
-            <button class="action-button rematch-button" @click="handleRematchClick">Rematch</button>
+              <button class="action-button rematch-button" @click="handleRematchClick">Rematch</button>
             </router-link>
             <router-link to="/main">
-            <button class="action-button exit-button" @click="handleExitClick">Back to Lobby</button>
-             </router-link>
+              <button class="action-button exit-button" @click="handleExitClick">Back to Lobby</button>
+            </router-link>
           </div>
         </div>
       </div>
@@ -119,7 +119,7 @@ export default {
   background-color: #364b3f;
   border-radius: 15px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-              /* 0 0 15px rgba(224, 217, 217, 0.3) inset; */
+  /* 0 0 15px rgba(224, 217, 217, 0.3) inset; */
   padding: 40px 20px;
   text-align: center;
   overflow: hidden;
@@ -145,10 +145,12 @@ export default {
   background: radial-gradient(circle at center, rgba(76, 175, 80, 0.3) 0%, rgba(76, 175, 80, 0) 70%);
   animation: pulse-light-win 2s infinite ease-out;
 }
+
 .celebration-card.lose .light-effect {
   background: radial-gradient(circle at center, rgba(244, 67, 54, 0.3) 0%, rgba(244, 67, 54, 0) 70%);
   animation: pulse-light-lose 2s infinite ease-out;
 }
+
 .celebration-card.draw .light-effect {
   background: radial-gradient(circle at center, rgba(255, 193, 7, 0.3) 0%, rgba(255, 193, 7, 0) 70%);
   animation: pulse-light-draw 2s infinite ease-out;
@@ -198,10 +200,12 @@ export default {
   /* color: #8bc34a; */
   text-shadow: 0 0 15px rgba(139, 195, 74, 0.8);
 }
+
 .celebration-card.lose .outcome-text {
   /* color: #f44333; */
   text-shadow: 0 0 15px rgba(244, 67, 51, 0.8);
 }
+
 .celebration-card.draw .outcome-text {
   /* color: #ffc107; */
   text-shadow: 0 0 15px rgba(255, 193, 7, 0.8);
@@ -263,55 +267,141 @@ export default {
 .celebration-fade-scale-leave-active {
   transition: opacity 0.5s ease;
 }
+
 .celebration-fade-scale-enter-from,
 .celebration-fade-scale-leave-to {
   opacity: 0;
 }
 
 @keyframes card-appear {
-  0% { transform: scale(0.5) translateY(-50px); opacity: 0; }
-  60% { transform: scale(1.05) translateY(10px); opacity: 1; }
-  100% { transform: scale(1) translateY(0); }
+  0% {
+    transform: scale(0.5) translateY(-50px);
+    opacity: 0;
+  }
+
+  60% {
+    transform: scale(1.05) translateY(10px);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1) translateY(0);
+  }
 }
 
 @keyframes content-fade-in {
-  0% { opacity: 0; transform: translateY(20px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes text-bounce {
-  0% { transform: scale(0.5); opacity: 0; }
-  60% { transform: scale(1.1); opacity: 1; }
-  80% { transform: scale(0.95); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+
+  60% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+
+  80% {
+    transform: scale(0.95);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 @keyframes pulse-light {
-  0% { transform: translate(-50%, -50%) scale(0); opacity: 0.5; }
-  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.1; }
-  100% { transform: translate(-50%, -50%) scale(0); opacity: 0.5; }
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.1;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.5;
+  }
 }
+
 @keyframes pulse-light-win {
-  0% { transform: translate(-50%, -50%) scale(0); opacity: 0.5; }
-  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.1; }
-  100% { transform: translate(-50%, -50%) scale(0); opacity: 0.5; }
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.1;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.5;
+  }
 }
+
 @keyframes pulse-light-lose {
-  0% { transform: translate(-50%, -50%) scale(0); opacity: 0.5; }
-  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.1; }
-  100% { transform: translate(-50%, -50%) scale(0); opacity: 0.5; }
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.1;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.5;
+  }
 }
+
 @keyframes pulse-light-draw {
-  0% { transform: translate(-50%, -50%) scale(0); opacity: 0.5; }
-  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.1; }
-  100% { transform: translate(-50%, -50%) scale(0); opacity: 0.5; }
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.1;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.5;
+  }
 }
 
 .celebration-fade-scale-leave-active .celebration-card {
   animation: card-disappear 0.3s ease-in forwards;
 }
+
 @keyframes card-disappear {
-  from { transform: scale(1); opacity: 1; }
-  to { transform: scale(0.9); opacity: 0; }
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  to {
+    transform: scale(0.9);
+    opacity: 0;
+  }
 }
 </style>

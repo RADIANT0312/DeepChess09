@@ -1,12 +1,7 @@
 <template>
   <BaseTopBar @expansion-change="emitExpansionChange" :fixed="true">
     <template #content>
-      <button 
-        class="resign-button" 
-        @click.stop="handleResign" 
-        :disabled="isResigning"
-        type="button"
-      >
+      <button class="resign-button" @click.stop="handleResign" :disabled="isResigning" type="button">
         <span v-if="isResigning">
           {{ mode === 'game' ? 'Resigning...' : 'Exiting...' }}
         </span>
@@ -89,10 +84,10 @@ export default {
 
     updateTime() {
       const now = new Date();
-      this.currentTime = now.toLocaleTimeString('zh-CN', { 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit' 
+      this.currentTime = now.toLocaleTimeString('zh-CN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
       });
     },
 
@@ -105,7 +100,7 @@ export default {
       console.log('gameId:', this.gameId); // 调试日志
       console.log('mode:', this.mode); // 调试日志
       console.log('isResigning:', this.isResigning); // 调试日志
-      
+
       if (!this.gameId || this.isResigning) {
         console.log('早期返回：gameId或isResigning检查失败'); // 调试日志
         return;
@@ -136,7 +131,7 @@ export default {
       try {
         console.log('开始退出流程'); // 调试日志
         this.isResigning = true;
-        
+
         // 根据模式调用不同的API
         if (this.mode === 'game') {
           // 只有对弈模式才调用认输API
@@ -146,10 +141,10 @@ export default {
           // 教学模式和历史模式直接退出
           console.log(`退出${this.mode}模式`);
         }
-        
+
         // 发出认输事件给父组件
         this.$emit('game-resigned');
-        
+
         console.log('操作成功'); // 调试日志
       } catch (error) {
         console.error('操作失败:', error);
@@ -302,10 +297,13 @@ export default {
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }
+
   50% {
     transform: scale(1.1);
     opacity: 0.7;

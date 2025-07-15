@@ -2,7 +2,7 @@
   <div id="app">
     <!-- 全局 topbar，根据当前路由显示不同的 topbar -->
     <component :is="currentTopbar" v-if="currentTopbar" />
-    
+
     <!-- 页面内容区域，只有这部分参与动画 -->
     <router-view v-slot="{ Component, route }">
       <transition name="page-content" mode="out-in">
@@ -71,6 +71,7 @@ export default {
 
 /* 页面内容容器 */
 .page-content {
-  min-height: calc(100vh - 60px); /* 减去 topbar 的大概高度 */
+  min-height: calc(100vh - 60px);
+  /* 减去 topbar 的大概高度 */
 }
 </style>

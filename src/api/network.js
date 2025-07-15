@@ -1,4 +1,4 @@
-import apiClient from './index.js';
+import apiClient from "./index.js";
 
 /**
  * 网络状态检测相关 API
@@ -11,13 +11,13 @@ export const network = {
   async checkLatency() {
     try {
       const startTime = performance.now();
-      await apiClient.get('/ping', {
-        timeout: 5000 // 5秒超时
+      await apiClient.get("/ping", {
+        timeout: 5000, // 5秒超时
       });
       const endTime = performance.now();
       return Math.round(endTime - startTime);
     } catch (error) {
-      console.warn('延迟检测失败:', error);
+      console.warn("延迟检测失败:", error);
       return -1; // 返回-1表示连接失败
     }
   },
@@ -29,37 +29,37 @@ export const network = {
   async checkConnection() {
     try {
       const latency = await this.checkLatency();
-      
+
       if (latency === -1) {
         return {
-          status: 'disconnected',
+          status: "disconnected",
           latency: -1,
-          message: '无法连接到服务器'
+          message: "无法连接到服务器",
         };
       }
-      
-      let status = 'good';
-      let message = '连接良好';
-      
+
+      let status = "good";
+      let message = "连接良好";
+
       if (latency > 1000) {
-        status = 'poor';
-        message = '连接较差';
+        status = "poor";
+        message = "连接较差";
       } else if (latency > 500) {
-        status = 'fair';
-        message = '连接一般';
+        status = "fair";
+        message = "连接一般";
       }
-      
+
       return {
         status,
         latency,
-        message
+        message,
       };
     } catch (error) {
       return {
-        status: 'error',
+        status: "error",
         latency: -1,
-        message: '网络检测错误'
+        message: "网络检测错误",
       };
     }
-  }
+  },
 };

@@ -14,11 +14,7 @@
     </template>
     <template #content3>
       <div class="controls">
-        <el-button
-          class="topbar-white-btn"
-          plain
-          @click="$router.push('/main')"
-        >
+        <el-button class="topbar-white-btn" plain @click="$router.push('/main')">
           Back to Main Page
         </el-button>
       </div>
@@ -63,7 +59,7 @@ export default {
     togglePin() {
       this.isPinned = !this.isPinned;
     },
-     goBack() {
+    goBack() {
       this.$router.push('/'); // 或者你想跳转的起始页面路径
     },
     async fetchAvatar() {
@@ -79,8 +75,10 @@ export default {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  pointer-events: none; /* 保证不挡点击 */
+  pointer-events: none;
+  /* 保证不挡点击 */
 }
+
 .date-display {
   color: #ffffff;
   font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -94,29 +92,33 @@ export default {
   background-clip: text;
   pointer-events: none;
 }
+
 .controls {
   display: flex;
   align-items: center;
   gap: 10px;
 }
+
 .topbar-white-btn {
-  background: rgba(255,255,255,0.15) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
   color: #fff !important;
-  border: 1px solid rgba(255,255,255,0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
   border-radius: 8px !important;
   font-weight: 600;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-  transition: all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   padding: 10px 24px;
   font-size: 16px;
   backdrop-filter: blur(8px);
 }
+
 .topbar-white-btn:hover {
-  background: rgba(255,255,255,0.25) !important;
+  background: rgba(255, 255, 255, 0.25) !important;
   color: #333 !important;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
   transform: translateY(-1px);
 }
+
 .user-avatar {
   width: 36px;
   height: 36px;
@@ -126,9 +128,11 @@ export default {
   border: 1px solid rgba(255, 255, 255, 0.3);
   cursor: pointer;
 }
-a > .user-avatar {
+
+a>.user-avatar {
   display: block;
 }
+
 .top-bar.expanded {
   height: 60px;
 }

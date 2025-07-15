@@ -63,7 +63,7 @@ export default {
   mounted() {
 
     this.perspective = this.userColor === 'white' ? 'WHITE' : 'BLACK';
-    
+
     // usercolor为哪个，auto另外一个
     if (this.userColor === 'white') {
       this.autoWhite = false;
@@ -126,10 +126,10 @@ export default {
     onMoveCallback(moveRecord) {
       // 将移动记录添加到组件的移动历史中
       this.moveHistory.push(moveRecord);
-      
+
       // 触发自定义事件，让父组件也能接收到移动信息
       this.$emit('move', moveRecord);
-      
+
       // 可以在这里添加其他逻辑，比如发送到服务器
       console.log('Move recorded:', moveRecord);
     },
@@ -157,7 +157,7 @@ export default {
       if (shouldAutoplay) {
         // 检查是否是当前回合的第一次调用
         const isFirstCallInTurn = this.lastTurn !== this.game.turn;
-        
+
         if (isFirstCallInTurn) {
           this.lastTurn = this.game.turn;
           game.makeMove(this.gameId, this.getLastMove().toLowerCase()).then(ai_move_data => {
@@ -189,7 +189,7 @@ export default {
       }
 
       this.autoplayInterval = setTimeout(() => {
-      this.autoplayTick();
+        this.autoplayTick();
       }, this.getSpeedValue());
     },
 
@@ -321,16 +321,18 @@ export default {
   align-content: center;
   align-items: center;
 }
+
 .board .row .tile .captures {
   align-items: flex-start;
   justify-content: space-between;
 }
+
 .board .row .tile:not(.occupied) .captures {
   align-items: center;
   justify-content: center;
 }
 
-.board .row .tile > div > svg {
+.board .row .tile>div>svg {
   --stroke: transparent;
   box-sizing: border-box;
   height: var(--di);
@@ -350,15 +352,49 @@ export default {
   opacity: 0.4;
 }
 
-.board .row .tile.occupied .captures svg { position: absolute; }
-.board .row .tile.occupied .captures svg:nth-child(1) { top: 0; left: 0; }
-.board .row .tile.occupied .captures svg:nth-child(2) { top: 0; right: 0; }
-.board .row .tile.occupied .captures svg:nth-child(3) { bottom: calc(var(--di) * 0.1); left: 0; }
-.board .row .tile.occupied .captures svg:nth-child(4) { bottom: calc(var(--di) * 0.1); right: 0; }
-.board .row .tile.occupied .captures svg:nth-child(5) { top: calc(50% - var(--di) * 0.55); left: 0; }
-.board .row .tile.occupied .captures svg:nth-child(6) { top: calc(50% - var(--di) * 0.55); right: 0; }
-.board .row .tile.occupied .captures svg:nth-child(7) { top: 0; left: calc(50% - var(--di) * 0.5); }
-.board .row .tile.occupied .captures svg:nth-child(8) { bottom: calc(var(--di) * 0.1); left: calc(50% - var(--di) * 0.5); }
+.board .row .tile.occupied .captures svg {
+  position: absolute;
+}
+
+.board .row .tile.occupied .captures svg:nth-child(1) {
+  top: 0;
+  left: 0;
+}
+
+.board .row .tile.occupied .captures svg:nth-child(2) {
+  top: 0;
+  right: 0;
+}
+
+.board .row .tile.occupied .captures svg:nth-child(3) {
+  bottom: calc(var(--di) * 0.1);
+  left: 0;
+}
+
+.board .row .tile.occupied .captures svg:nth-child(4) {
+  bottom: calc(var(--di) * 0.1);
+  right: 0;
+}
+
+.board .row .tile.occupied .captures svg:nth-child(5) {
+  top: calc(50% - var(--di) * 0.55);
+  left: 0;
+}
+
+.board .row .tile.occupied .captures svg:nth-child(6) {
+  top: calc(50% - var(--di) * 0.55);
+  right: 0;
+}
+
+.board .row .tile.occupied .captures svg:nth-child(7) {
+  top: 0;
+  left: calc(50% - var(--di) * 0.5);
+}
+
+.board .row .tile.occupied .captures svg:nth-child(8) {
+  bottom: calc(var(--di) * 0.1);
+  left: calc(50% - var(--di) * 0.5);
+}
 
 .touching .board .row .tile .moves,
 .touching .board .row .tile .captures,
@@ -371,7 +407,7 @@ export default {
 
 .board .row .tile[class*="highlight-"] .moves,
 .board .row .tile[class*="highlight-"] .captures {
-  display: none;  
+  display: none;
 }
 
 button:focus {
@@ -386,8 +422,13 @@ svg {
   fill: var(--fill);
 }
 
-svg.white { --fill: var(--color-white); }
-svg.black { --fill: var(--color-black); }
+svg.white {
+  --fill: var(--color-white);
+}
+
+svg.black {
+  --fill: var(--color-black);
+}
 
 .pieces {
   display: block;
@@ -403,9 +444,11 @@ svg.black { --fill: var(--color-black); }
 .pieces .piece.white {
   --pos-row: -1;
 }
+
 .pieces .piece.black {
   --pos-row: 8;
 }
+
 .pieces .piece {
   --pos-col: 3.5;
   --scale: 0;
@@ -416,23 +459,18 @@ svg.black { --fill: var(--color-black); }
   height: var(--diameter-tile);
   position: absolute;
   left: 0;
-  transform: translate(
-      calc(var(--pos-col) * 100%),
-      calc(var(--pos-row) * -100%)
-    )
-    translateZ(0);
+  transform: translate(calc(var(--pos-col) * 100%),
+      calc(var(--pos-row) * -100%)) translateZ(0);
   transform-origin: 50% 50%;
-  transition: all var(--transition-duration) var(--transition-ease)
-    var(--transition-delay);
+  transition: all var(--transition-duration) var(--transition-ease) var(--transition-delay);
   width: var(--diameter-tile);
 }
+
 .perspective-black .pieces .piece {
-  transform: translate(
-      calc((7 - var(--pos-col)) * 100%),
-      calc((7 - var(--pos-row)) * -100%)
-    )
-    translateZ(0);
+  transform: translate(calc((7 - var(--pos-col)) * 100%),
+      calc((7 - var(--pos-row)) * -100%)) translateZ(0);
 }
+
 .pieces .piece svg {
   display: block;
   left: 50%;
@@ -445,6 +483,7 @@ svg.black { --fill: var(--color-black); }
     fill var(--transition-duration) var(--transition-ease),
     opacity var(--transition-duration) var(--transition-ease);
 }
+
 .turn-white .pieces .piece:not(.highlight-capture) svg.black,
 .turn-black .pieces .piece:not(.highlight-capture) svg.white,
 .turn-black .pieces .piece:not(.can-move):not(.can-capture) svg.black,
@@ -454,19 +493,42 @@ svg.black { --fill: var(--color-black); }
 }
 
 @-webkit-keyframes wobble {
-  0%, 50%, 100% { transform: translate(-50%, -50%) translateZ(0) scale(1) rotate(0deg); }
-  25% { transform: translate(-50%, -50%) translateZ(0) scale(1.1) rotate(-2deg); }
-  75% { transform: translate(-50%, -50%) translateZ(0) scale(1.1) rotate(2deg); }
+
+  0%,
+  50%,
+  100% {
+    transform: translate(-50%, -50%) translateZ(0) scale(1) rotate(0deg);
+  }
+
+  25% {
+    transform: translate(-50%, -50%) translateZ(0) scale(1.1) rotate(-2deg);
+  }
+
+  75% {
+    transform: translate(-50%, -50%) translateZ(0) scale(1.1) rotate(2deg);
+  }
 }
 
 @keyframes wobble {
-  0%, 50%, 100% { transform: translate(-50%, -50%) translateZ(0) scale(1) rotate(0deg); }
-  25% { transform: translate(-50%, -50%) translateZ(0) scale(1.1) rotate(-2deg); }
-  75% { transform: translate(-50%, -50%) translateZ(0) scale(1.1) rotate(2deg); }
+
+  0%,
+  50%,
+  100% {
+    transform: translate(-50%, -50%) translateZ(0) scale(1) rotate(0deg);
+  }
+
+  25% {
+    transform: translate(-50%, -50%) translateZ(0) scale(1.1) rotate(-2deg);
+  }
+
+  75% {
+    transform: translate(-50%, -50%) translateZ(0) scale(1.1) rotate(2deg);
+  }
 }
+
 .pieces .piece.highlight-active svg {
   -webkit-animation: wobble 500ms linear infinite;
-          animation: wobble 500ms linear infinite;
+  animation: wobble 500ms linear infinite;
   --stroke: var(--color-success);
 }
 

@@ -1,4 +1,4 @@
-import apiClient from './index.js';
+import apiClient from "./index.js";
 
 /**
  * 对弈游戏相关 API (game page1)
@@ -15,7 +15,7 @@ export const game = {
    * @returns {Promise} API 响应
    */
   createMatch: (gameConfig) => {
-    return apiClient.post('/game/match', gameConfig);
+    return apiClient.post("/game/match", gameConfig);
   },
 
   /**
@@ -44,5 +44,5 @@ export const game = {
    */
   resign: (gameId) => {
     return apiClient.post(`/game/${gameId}/resign`);
-  }
+  },
 };

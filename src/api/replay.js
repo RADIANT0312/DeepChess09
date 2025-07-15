@@ -1,4 +1,4 @@
-import apiClient from './index.js';
+import apiClient from "./index.js";
 
 /**
  * 复盘相关 API
@@ -11,5 +11,5 @@ export const replay = {
    */
   getReplay: (gameId) => {
     return apiClient.get(`/replay/${gameId}`);
-  }
+  },
 };

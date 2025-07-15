@@ -1,4 +1,4 @@
-import apiClient from './index.js';
+import apiClient from "./index.js";
 
 /**
  * 认证相关 API
@@ -12,7 +12,7 @@ export const auth = {
    * @returns {Promise} API 响应
    */
   login: (credentials) => {
-    return apiClient.post('/auth/login', credentials);
+    return apiClient.post("/auth/login", credentials);
   },
 
   /**
@@ -20,7 +20,7 @@ export const auth = {
    * @returns {Promise} API 响应
    */
   logout: () => {
-    return apiClient.post('/auth/logout');
+    return apiClient.post("/auth/logout");
   },
 
   /**
@@ -28,14 +28,13 @@ export const auth = {
    * @returns {Promise} API 响应
    */
   checkStatus: () => {
-    return apiClient.get('/start');
+    return apiClient.get("/start");
   },
 
   /**
    * register
    */
   register: (userData) => {
-    return apiClient.post('/auth/register', userData);
-  }
-
+    return apiClient.post("/auth/register", userData);
+  },
 };

@@ -17,14 +17,14 @@ export default {
       // 游戏基本信息
       mode: null, // 'game', 'learning', 'history'
       gameId: null,
-      
+
       // 游戏状态
       gameData: null,
       isLoading: true,
       loadError: null,
       isTimeout: false,
       timeoutTimer: null,
-      
+
       // 通用游戏数据
       boardState: '',
       moves: [],
@@ -32,7 +32,7 @@ export default {
       userColor: '',
       gameStatus: 'ongoing',
       gameResult: 'ongoing',
-      
+
       // 教学模式特有数据
       instructions: '',
       objectives: [],
@@ -45,15 +45,15 @@ export default {
     // 从路由参数获取mode和gameId
     this.mode = this.$route.query.mode || this.$route.params.mode;
     this.gameId = this.$route.query.gameId || this.$route.params.gameId;
-    
+
     console.log('Game组件初始化:', { mode: this.mode, gameId: this.gameId });
-    
+
     if (!this.mode || !this.gameId) {
       this.loadError = 'Lack of required parameters: mode or gameId';
       this.isLoading = false;
       return;
     }
-    
+
     await this.initializeGame();
   },
   mounted() {
@@ -69,7 +69,7 @@ export default {
     async initializeGame() {
       try {
         this.loadError = null;
-        
+
         switch (this.mode) {
           case 'game':
             await this.initGameMode();
@@ -83,7 +83,7 @@ export default {
           default:
             throw new Error(`未知的游戏模式: ${this.mode}`);
         }
-        
+
         this.isLoading = false;
       } catch (error) {
         console.error('游戏初始化失败:', error);
@@ -91,13 +91,13 @@ export default {
         this.isLoading = false;
       }
     },
-    
+
     async initGameMode() {
       console.log('初始化对弈模式, gameId:', this.gameId);
       const response = await game.getGameState(this.gameId);
       console.log('获取对弈状态1');
       const data = response.data;
-      
+
       this.gameData = data;
       this.boardState = data.boardState;
       this.moves = data.moves || [];
@@ -106,12 +106,12 @@ export default {
       this.gameStatus = data.status;
       this.gameResult = data.result;
     },
-    
+
     async initLearningMode() {
       console.log('初始化教学模式, lessonId:', this.gameId);
       const response = await teaching.getLesson(this.gameId);
       const data = response.data;
-      
+
       this.gameData = data;
       this.boardState = data.boardState;
       this.moves = data.moves || [];
@@ -125,13 +125,13 @@ export default {
       this.gameStatus = 'ongoing';
       this.gameResult = 'ongoing';
     },
-    
+
     async initHistoryMode() {
       console.log('初始化历史模式, gameId:', this.gameId);
       // 历史模式使用与对弈模式相同的API，但是只读
       const response = await game.getGameState(this.gameId);
       const data = response.data;
-      
+
       this.gameData = data;
       this.boardState = data.boardState;
       this.moves = data.moves || [];
@@ -140,14 +140,14 @@ export default {
       this.gameStatus = 'finished'; // 历史对局都是已完成的
       this.gameResult = data.result;
     },
-    
+
     startTimeoutTimer() {
       this.timeoutTimer = setTimeout(() => {
         console.warn('页面操作超时');
         this.isTimeout = true;
       }, 3000000); // 30秒超时
     },
-    
+
     resetTimeout() {
       if (this.timeoutTimer) {
         clearTimeout(this.timeoutTimer);
@@ -155,14 +155,14 @@ export default {
       this.isTimeout = false;
       this.startTimeoutTimer();
     },
-    
+
     handleGameResigned() {
       // 处理认输事件
       console.log('游戏已认输');
       // 跳转到结果页面或返回主页
       this.$router.push('/main');
     },
-    
+
     handleUserInteraction() {
       // 用户有操作时重置超时计时器
       this.resetTimeout();
@@ -179,7 +179,7 @@ export default {
         <p>Starting game...</p>
       </div>
     </div>
-    
+
     <!-- 错误状态 -->
     <div v-else-if="loadError" class="error-overlay">
       <div class="error-content">
@@ -187,7 +187,7 @@ export default {
         <button @click="$router.push('/main')" class="back-button">Back to Home</button>
       </div>
     </div>
-    
+
     <!-- 超时遮罩层 -->
     <div v-if="isTimeout" class="timeout-overlay">
       <div class="timeout-content">
@@ -196,29 +196,16 @@ export default {
         <button @click="handleGameResigned" class="resign-only-button">Exit Game</button>
       </div>
     </div>
-    
+
     <!-- 正常游戏界面 -->
     <template v-else>
-      <TopBar 
-        :gameId="gameId" 
-        :mode="mode"
-        :gameData="gameData"
-        @game-resigned="handleGameResigned" 
-      />
+      <TopBar :gameId="gameId" :mode="mode" :gameData="gameData" @game-resigned="handleGameResigned" />
       <SideBar />
       <div v-if="!isLoading" class="board-area">
-        <Board 
-          :gameId="gameId"
-          :boardState="this.boardState"
-          :moves="this.moves"
-          :currentPlayer="this.currentPlayer"
-          :userColor="this.userColor"
-          :gameStatus="this.gameStatus"
-          :gameResult="this.gameResult"
-          :mode="this.mode"
-        />
+        <Board :gameId="gameId" :boardState="this.boardState" :moves="this.moves" :currentPlayer="this.currentPlayer"
+          :userColor="this.userColor" :gameStatus="this.gameStatus" :gameResult="this.gameResult" :mode="this.mode" />
       </div>
-      
+
     </template>
   </div>
 </template>
@@ -275,8 +262,13 @@ export default {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* 错误遮罩层 */
@@ -376,7 +368,7 @@ export default {
     margin: 20px;
     max-height: none;
   }
-  
+
   .board-area {
     width: calc(100% - 40px);
     margin-right: 20px;

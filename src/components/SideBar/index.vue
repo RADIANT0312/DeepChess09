@@ -1,11 +1,6 @@
 <template>
-  <div 
-    class="side-bar" 
-    :class="{ 'expanded': isExpanded, 'dragging': isDragging }" 
-    :style="sidebarStyle"
-    @mousedown.left="handleMouseDown"
-    @contextmenu.prevent="expandSidebar"
-  >
+  <div class="side-bar" :class="{ 'expanded': isExpanded, 'dragging': isDragging }" :style="sidebarStyle"
+    @mousedown.left="handleMouseDown" @contextmenu.prevent="expandSidebar">
     <img src="/sidebar-logo.svg" alt="DeepChess Logo" class="collapsed-logo" />
     <div class="side-bar-content">
       <div class="header" @mousedown.left="handleHeaderMouseDown">
@@ -30,7 +25,7 @@
         <div class="time-display" v-show="isExpanded">{{ currentTime }}</div>
         <button class="collapse-button" @click.stop="collapseSidebar" v-show="isExpanded">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
           </svg>
         </button>
       </div>
@@ -90,10 +85,10 @@ export default {
 
     updateTime() {
       const now = new Date();
-      this.currentTime = now.toLocaleTimeString('zh-CN', { 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit' 
+      this.currentTime = now.toLocaleTimeString('zh-CN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
       });
     },
 
@@ -112,7 +107,7 @@ export default {
 
     startDrag(event) {
       this.isDragging = true;
-      
+
       const rect = this.$el.getBoundingClientRect();
       this.dragStartOffset.x = event.clientX - rect.left;
       this.dragStartOffset.y = event.clientY - rect.top;
@@ -123,17 +118,17 @@ export default {
 
     onDrag(event) {
       if (!this.isDragging) return;
-      
+
       // Prevent text selection while dragging
       event.preventDefault();
 
       const newTop = event.clientY - this.dragStartOffset.y;
       const newRight = window.innerWidth - (event.clientX - this.dragStartOffset.x + this.$el.offsetWidth);
-      
+
       // Boundary constraints
       const maxTop = window.innerHeight - this.$el.offsetHeight;
       const maxRight = window.innerWidth - this.$el.offsetWidth;
-      
+
       this.position.top = Math.max(0, Math.min(newTop, maxTop));
       this.position.right = Math.max(0, Math.min(newRight, maxRight));
     },
@@ -195,7 +190,7 @@ export default {
   cursor: pointer;
   overflow: hidden;
   border-radius: 10px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -206,18 +201,21 @@ export default {
 
 .side-bar.dragging {
   cursor: grabbing;
-  transition: none; /* Disable transition while dragging for responsiveness */
-  user-select: none; /* Prevent text selection while dragging */
+  transition: none;
+  /* Disable transition while dragging for responsiveness */
+  user-select: none;
+  /* Prevent text selection while dragging */
 }
 
 .side-bar:not(.expanded):not(.dragging):hover {
-  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
 }
 
 .side-bar.expanded {
   height: 90vh;
   width: 350px;
-  cursor: default; /* Change cursor back when expanded */
+  cursor: default;
+  /* Change cursor back when expanded */
 }
 
 .collapsed-logo {
@@ -257,8 +255,10 @@ export default {
   padding: 0 24px;
   margin-bottom: 30px;
   min-height: 40px;
-  cursor: move; /* Add cursor to indicate draggable */
-  user-select: none; /* Prevent text selection during drag */
+  cursor: move;
+  /* Add cursor to indicate draggable */
+  user-select: none;
+  /* Prevent text selection during drag */
 }
 
 .logo {
@@ -296,7 +296,7 @@ export default {
 }
 
 .nav-items li a:hover {
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   color: #fff;
 }
 
@@ -355,7 +355,7 @@ export default {
 }
 
 .collapse-button:hover {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
   color: #fff;
 }
 
