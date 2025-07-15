@@ -22,13 +22,15 @@
 import ProfileTopbar from './components/Profile/topbar.vue';
 import MainTopbar from './components/Main/topbar.vue';
 import GameTopbar from './components/Game/topbar.vue';
+import SelectModeTopBar from './components/SelectMode/topbar.vue';
 
 export default {
   name: 'App',
   components: {
     ProfileTopbar,
     MainTopbar,
-    GameTopbar
+    GameTopbar,
+    SelectModeTopBar
   },
   computed: {
     // 根据当前路由确定要显示的 topbar
@@ -41,6 +43,8 @@ export default {
           return 'MainTopbar';
         case 'Game':
           return 'GameTopbar';
+        case 'SelectMode':
+          return 'SelectModeTopBar';
         default:
           return null;
       }
