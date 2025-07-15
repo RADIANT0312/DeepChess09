@@ -96,7 +96,7 @@
                   <span class="game-duration">{{ formatDuration(game.duration) }}</span>
                   <span class="game-color" :class="game.userColor">{{ game.userColor === 'white' ? 'White' : 'Black'
                     }}</span>
-                  <button @click.stop="analyzeGame(game.gameId)" class="analyze-button" title="复盘分析">
+                  <button @click.stop="analyzeGame(game.gameId)" class="analyze-button" title="review">
                     review
                   </button>
                 </div>
@@ -548,7 +548,7 @@ export default {
 
 /* 通用卡片样式 */
 .card {
-  background-color: #cdd5e2;
+  background-color: #D1D8BE;
   border-radius: 10px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
   padding: 30px;
@@ -654,10 +654,7 @@ h2 {
   /* 允许换行 */
   gap: 20px;
   margin-bottom: 30px;
-  background-color: #b8cdc7;
   padding: 15px;
-  border-radius: 8px;
-  border: 1px solid #eef;
 }
 
 .filter-group {
@@ -674,7 +671,7 @@ h2 {
 
 .filter-select {
   padding: 10px 20px;
-  border: 1px solid #ced4da;
+  border: 1px solid #819A91;
   border-radius: 6px;
   background-color: white;
   font-size: 0.95em;
@@ -691,9 +688,9 @@ h2 {
 }
 
 .filter-select:focus {
-  border-color: #80bdff;
+  border-color: #819A91;
   outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  box-shadow: 0 0 0 0.2rem #819A91;
 }
 
 
@@ -1029,7 +1026,7 @@ h2 {
 
 /* 复盘按钮样式 */
 .analyze-button {
-  background-color: #2196F3;
+  background-color: #819A91;
   color: white;
   border: none;
   padding: 0.3rem 0.8rem;
@@ -1041,7 +1038,7 @@ h2 {
 }
 
 .analyze-button:hover {
-  background-color: #0b7dda;
+  background-color: #5c6d67;
   transform: translateY(-1px);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
