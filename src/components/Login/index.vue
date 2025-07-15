@@ -180,7 +180,6 @@ h2 {
   background-color: #007bff;
   color: rgb(255, 255, 255);
   font-size: 1.5rem;
-  font-family: "Palatin Linotype", cursive;
   cursor: pointer;
   transition: background-color 0.3s;
   margin-top: 1rem;

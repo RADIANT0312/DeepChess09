@@ -1,6 +1,6 @@
 <template>
   <div class="start">
-    <router-link to="/main" class="play-button">DEEP ♜ CHESS</router-link>
+    <router-link to="/main" class="play-button"><span style="color: black;">Deep ♞ </span><span style="color: white;">Chess</span></router-link>
   </div>
 </template>
 
@@ -26,7 +26,6 @@ export default {
   background: rgba(255, 255, 255, 0.2);
   border: 2px solid white;
   border-radius: 50px;
-  font-family: "Palatin Linotype", cursive;
   font-style: normal;
   /* font-style: italic; */
   font-weight: 600;

@@ -81,7 +81,6 @@ export default {
 
 .date-display {
   color: #ffffff;
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 18px;
   font-weight: 600;
   letter-spacing: 0.5px;

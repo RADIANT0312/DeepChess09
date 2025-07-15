@@ -108,7 +108,6 @@ export default {
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  font-family: 'Arial', sans-serif;
   color: #fff;
 }
 
@@ -185,7 +184,6 @@ export default {
 }
 
 .outcome-text {
-  font-family: "Palatin Linotype", cursive;
   font-style: normal;
   font-size: 3.5em;
   font-weight: bold;
@@ -219,7 +217,6 @@ export default {
 }
 
 .action-button {
-  font-family: "Palatin Linotype", cursive;
   font-style: normal;
   background-color: #1F2828;
   color: white;

@@ -1,0 +1,56 @@
+/* src/assets/main.css or src/assets/fonts.css */
+
+/* --- 定义常规字重 --- */
+@font-face {
+  /* 1. 定义字体家族名称，后续在 CSS 中会使用这个名字 */
+  font-family: "Palatin Linotype";
+
+  /* 2. 指定字体文件的路径 */
+  /* 优先使用 woff2，如果浏览器不支持，则会降级使用 woff */
+  src: url("@/assets/fonts/palatinolinotype_roman.ttf") format("truetype");
+
+  /* 3. 定义这个字体文件的字重和样式 */
+  font-weight: normal;
+  font-style: normal;
+
+  /* 4. 优化字体加载行为 */
+  /* 'swap' 表示先用系统默认字体渲染，字体下载好后立刻替换。可以避免文字长时间空白。*/
+  font-display: swap;
+}
+
+/* --- 如果你还有粗体，需要再定义一个 @font-face --- */
+@font-face {
+  font-family: "Palatin Linotype";
+
+  src: url("@/assets/fonts/palatinolinotype_bold.ttf") format("truetype");
+
+  /* 指定这个文件是粗体 */
+  font-weight: bold;
+  /* 或 700 */
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Palatin Linotype";
+
+  src: url("@/assets/fonts/palatinolinotype_italic.ttf") format("truetype");
+
+  /* 指定这个文件是粗体 */
+  font-weight: normal;
+  /* 或 700 */
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Palatin Linotype";
+
+  src: url("@/assets/fonts/palatinolinotype_bolditalic.ttf") format("truetype");
+
+  /* 指定这个文件是粗体 */
+  font-weight: bold;
+  /* 或 700 */
+  font-style: italic;
+  font-display: swap;
+}

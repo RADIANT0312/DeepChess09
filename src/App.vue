@@ -50,7 +50,7 @@ export default {
   width: 100%;
   height: 100vh;
   background-color: #4f5442;
-  font-family: "Palatin Linotype", cursive;
+  font-family: "Palatin Linotype";
 }
 
 /* 页面内容动画 - 只对内容区域应用动画，topbar 保持静态 */

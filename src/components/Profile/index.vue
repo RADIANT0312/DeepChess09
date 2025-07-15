@@ -497,7 +497,6 @@ export default {
 
 /* 用户中心主要内容容器 (之前名为 .user-center-container) */
 .user-center-container {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   max-width: 960px;
   /* 最大宽度限制内容区域 */
   margin: 30px auto;
@@ -857,7 +856,6 @@ h2 {
 }
 
 .move-notation {
-  font-family: 'Consolas', 'Monaco', monospace;
   font-size: 1.1em;
   color: #333;
   font-weight: bold;
@@ -893,7 +891,6 @@ h2 {
 
 .board-states-viewer pre {
   margin: 0;
-  font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
   font-size: 0.9em;
   line-height: 1.5;
   white-space: pre-wrap;

@@ -196,7 +196,6 @@ export default {
 <style scoped>
 .time-display {
   color: #ffffff;
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 18px;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -213,7 +212,6 @@ export default {
   border: none;
   border-radius: 6px;
   padding: 8px 16px;
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -244,7 +242,6 @@ export default {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 14px;
   font-weight: 600;
   padding: 6px 12px;
