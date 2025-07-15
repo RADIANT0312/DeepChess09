@@ -1,5 +1,5 @@
 <script>
-import SideBar from '@components/SideBar/index.vue';
+import SideBar from '@components/SideBarGame/index.vue';
 import Board from '@components/Board/index.vue';
 import TopBar from './topbar.vue';
 import { game } from '@/api/game.js';
