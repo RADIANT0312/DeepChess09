@@ -11,26 +11,29 @@
       </div>
 
       <div class="main-content-area">
-        <button class="AIbutton" style="font-style: italic;" :class="{ 'active-button': activeWorkplace === 'history' }"
-          @click="toggleWorkplace('history')">
-          History
-        </button>
-        <button class="AIbutton" style="font-style: italic;"
-          :class="{ 'active-button': activeWorkplace === 'AIcomment' }" @click="toggleWorkplace('AIcomment')">
-          AI Comment
-        </button>
-
+        <div class="button-row">
+          <button class="AIbutton" style="font-style: italic;" 
+            :class="{ 'active-button': activeWorkplace === 'history' }"
+            @click="toggleWorkplace('history')">
+            History
+          </button>
+          <button class="AIbutton" style="font-style: italic;"
+            :class="{ 'active-button': activeWorkplace === 'AIcomment' }"
+            @click="toggleWorkplace('AIcomment')">
+            AI Comment
+          </button>
+        </div>
         <div class="workplace" v-show="activeWorkplace === 'history'">
-          <h3>Game History:</h3>
-          <p v-if="!gameId">No active game to show history for. Create a match first.</p>
-          <p v-else-if="isLoadingHistory">Loading history...</p>
+          <h3>Move History</h3>
+          <p v-if="isLoadingHistory" class="loading-text">Loading history...</p>
           <p v-else-if="historyError" class="error-message">{{ historyError }}</p>
-          <div v-else-if="historyContent.length">
-            <p v-for="item in historyContent" :key="item.id" class="work-word">
-              <strong>{{ item.move }}:</strong> {{ item.comment }}
-            </p>
+          <div v-else-if="moveHistory.length" class="history-container">
+            <div v-for="(item, index) in moveHistory" :key="index" class="move-item">
+              <span class="move-number">{{ Math.floor(index / 2) + 1 }}{{ index % 2 === 0 ? '.' : '...' }}</span>
+              <span class="move-notation">{{ item }}</span>
+            </div>
           </div>
-          <p v-else>No game history available yet.</p>
+          <p v-else class="no-history">No game history available yet.</p>
         </div>
 
         <div class="workplace" v-show="activeWorkplace === 'AIcomment'">
@@ -66,7 +69,11 @@ export default {
     currentGameId: {
       type: String,
       default: null,
-    }
+    },
+    moveHistory: {
+      type: Array,
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -87,32 +94,6 @@ export default {
     }
   },
   emits: ['expansion-change', 'resign-game'],
-  watch: {
-    // 监听 currentGameId prop 的变化，更新组件内部的 gameId
-    currentGameId(newId) {
-      this.gameId = newId;
-      // 当 gameId 变化且有效时，重新加载数据
-      if (newId) {
-        // 每次 gameId 变化时，默认加载历史数据，并清空AI评论以便在切换时重新加载
-        this.fetchGameDetailsData();
-      } else {
-        // 如果没有 gameId，则清空数据和错误
-        this.historyContent = [];
-        this.aiCommentContent = [];
-        this.historyError = null;
-        this.aiCommentError = null;
-      }
-    },
-    // 监听 activeWorkplace 变化，按需加载数据（如果该工作区内容为空且未在加载中）
-    activeWorkplace(newWorkplace) {
-      // 这里的逻辑可以优化为只在需要时（即gameId存在且该tab内容为空时）才重新fetch
-      // 但由于 fetchGameDetailsData 会同时获取两种数据，可以简化为只在 gameId 变化时调用一次
-      // 如果数据量大，且AI评论或历史记录是独立加载的，才需要这里的细致控制
-      if (this.gameId && !this.historyContent.length && !this.aiCommentContent.length && !this.isLoadingHistory && !this.isLoadingAIComment) {
-        this.fetchGameDetailsData();
-      }
-    }
-  },
   computed: {
     sidebarStyle() {
       return {
@@ -120,6 +101,27 @@ export default {
         right: `${this.position.right}px`,
         transform: 'translateY(0)'
       };
+    }
+  },
+  watch: {
+    // 监听 moveHistory 变化，自动滚动到最新记录
+    moveHistory: {
+      handler(newHistory) {
+        if (newHistory && newHistory.length > 0) {
+          this.$nextTick(() => {
+            this.scrollToLatest();
+          });
+        }
+      },
+      deep: true
+    },
+    // 监听工作区切换到历史记录时也滚动到最新
+    activeWorkplace(newWorkplace) {
+      if (newWorkplace === 'history' && this.moveHistory.length > 0) {
+        this.$nextTick(() => {
+          this.scrollToLatest();
+        });
+      }
     }
   },
   mounted() {
@@ -215,43 +217,37 @@ export default {
     },
     toggleWorkplace(workplaceName) {
       this.activeWorkplace = workplaceName;
+      // 如果切换到历史记录且有数据，滚动到最新
+      if (workplaceName === 'history' && this.moveHistory.length > 0) {
+        this.$nextTick(() => {
+          this.scrollToLatest();
+        });
+      }
     },
 
-    // 统一的获取游戏详情数据的方法
-    async fetchGameDetailsData() {
-      if (!this.gameId) {
-        this.historyContent = [];
-        this.aiCommentContent = [];
-        return;
+    // 滚动到最新的移动记录
+    scrollToLatest() {
+      const historyContainer = this.$el.querySelector('.history-container');
+      if (historyContainer) {
+        // 使用平滑滚动到底部显示最新记录
+        historyContainer.scrollTo({
+          top: historyContainer.scrollHeight,
+          behavior: 'smooth'
+        });
+        
+        // 高亮最新的移动记录
+        const moveItems = historyContainer.querySelectorAll('.move-item');
+        if (moveItems.length > 0) {
+          const latestMove = moveItems[moveItems.length - 1];
+          latestMove.classList.add('latest-move');
+          
+          // 3秒后移除高亮效果
+          setTimeout(() => {
+            latestMove.classList.remove('latest-move');
+          }, 3000);
+        }
       }
-
-      this.isLoadingHistory = true; // 假设加载历史和评论同时开始
-      this.isLoadingAIComment = true;
-      this.historyError = null;
-      this.aiCommentError = null;
-
-      try {
-        // 调用 user 模块的 getGameDetails 方法来获取特定对局的详细信息
-        const response = await user.getGameDetails(this.gameId);
-
-        // 游戏历史: moves 数组
-        this.historyContent = response.data.moves || [];
-
-        // AI 评论: comments 数组
-        this.aiCommentContent = response.data.comments || [];
-
-        console.log('游戏详情数据获取成功:', response.data);
-
-      } catch (error) {
-        this.historyError = 'Failed to load game details.'; // 统一的错误消息
-        this.aiCommentError = 'Failed to load AI comments.'; // 统一的错误消息
-        // 错误已经在拦截器中处理并打印，这里只更新组件状态
-        console.error('获取游戏详情出错:', error);
-      } finally {
-        this.isLoadingHistory = false;
-        this.isLoadingAIComment = false;
-      }
-    }
+    },
 
   }
 }
@@ -370,30 +366,15 @@ export default {
 
 /* Styles for the main content area */
 .main-content-area {
-  flex-grow: 1;
+  flex-shrink: 0;
   display: flex;
+  height: 95%;
   flex-direction: column;
   padding-bottom: 20px;
   box-sizing: border-box;
-  /* Important for hiding scrollbar but allowing scroll */
-  overflow-y: scroll;
-  /* Allows content to scroll */
-  -ms-overflow-style: none;
-  /* For Internet Explorer and Edge */
-  scrollbar-width: none;
-  /* For Firefox */
+  overflow: hidden;
+  /* 禁止滚动 */
 }
-
-/* For Chrome, Safari, and Opera */
-.main-content-area::-webkit-scrollbar {
-  display: none;
-  /* Hide the scrollbar */
-  width: 0;
-  /* Ensures no width is reserved */
-  height: 0;
-  /* Ensures no height is reserved */
-}
-
 
 .nav-items {
   flex-grow: 1;
@@ -450,6 +431,7 @@ export default {
 }
 
 .footer {
+  position: absolute;
   padding: 0px 28px;
   display: flex;
   align-items: center;
@@ -482,19 +464,26 @@ export default {
   height: 24px;
 }
 
+.button-row {
+  display: flex;
+  gap: 10px;
+  margin: 10px 20px;
+  justify-content: space-between;
+}
+
 /* AIbutton styles */
 .AIbutton {
-  width: calc(100% - 40px);
+  flex: 1; /* 让按钮平均分配宽度 */
   height: 45px;
   /* Button height fixed */
+  padding: 10px 10px;
   background: #4a675e;
   color: #e0e0e0;
   border: none;
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  margin: 10px 20px;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -506,7 +495,7 @@ export default {
 
 /* Active button styles */
 .AIbutton.active-button {
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, #66eab7, #4ba265);
   color: #fff;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
   transform: translateY(-2px);
@@ -515,6 +504,7 @@ export default {
 /* Workplace styles */
 .workplace {
   width: 280px;
+  flex: 1;
   background: #2e3d37;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
@@ -524,6 +514,9 @@ export default {
   color: #c0c0c0;
   font-size: 14px;
   line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   /* 确保内部文本换行 */
   word-wrap: break-word;
   /* 强制长单词或URL在达到容器边界时换行 */
@@ -531,7 +524,6 @@ export default {
   /* 现代替代方案 */
   white-space: normal;
   /* 确保不强制单行 */
-  /* Removed overflow-y and max-height from here as main-content-area handles it */
   transition: all 0.5s ease-in-out;
 }
 
@@ -549,10 +541,124 @@ export default {
 }
 
 .work-word {
-  text-align: left;
-  color: #889296;
+  text-align: center;
+  color: #ffffff;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: bold;
   font-style: italic;
+}
+
+/* Move History Styles */
+.history-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 5px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.02);
+  scroll-behavior: smooth; /* 平滑滚动效果 */
+}
+
+.move-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 8px;
+  margin: 2px 0;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  font-family: 'Courier New', monospace;
+}
+
+.move-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.move-item:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* 最新移动记录的高亮样式 */
+.move-item.latest-move {
+  background: rgba(102, 234, 183, 0.15) !important;
+  border: 1px solid rgba(102, 234, 183, 0.3);
+  box-shadow: 0 0 8px rgba(102, 234, 183, 0.2);
+  animation: highlightPulse 3s ease-in-out;
+}
+
+@keyframes highlightPulse {
+  0% { 
+    background: rgba(102, 234, 183, 0.25);
+    box-shadow: 0 0 12px rgba(102, 234, 183, 0.4);
+  }
+  50% { 
+    background: rgba(102, 234, 183, 0.15);
+    box-shadow: 0 0 8px rgba(102, 234, 183, 0.2);
+  }
+  100% { 
+    background: rgba(102, 234, 183, 0.15);
+    box-shadow: 0 0 8px rgba(102, 234, 183, 0.2);
+  }
+}
+
+.move-number {
+  min-width: 35px;
+  color: #66eab7;
+  font-weight: 600;
+  font-size: 12px;
+  margin-right: 8px;
+}
+
+.move-notation {
+  color: #e0e0e0;
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+
+.loading-text {
+  color: #66eab7;
+  font-style: italic;
+  text-align: center;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.no-history {
+  color: #888;
+  font-style: italic;
+  text-align: center;
+  opacity: 0.7;
+}
+
+.error-message {
+  color: #ff6b6b;
+  font-weight: 500;
+  text-align: center;
+  background: rgba(255, 107, 107, 0.1);
+  padding: 8px;
+  border-radius: 4px;
+  border-left: 3px solid #ff6b6b;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Custom scrollbar for history container */
+.history-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.history-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.history-container::-webkit-scrollbar-thumb {
+  background: rgba(102, 234, 183, 0.5);
+  border-radius: 2px;
+}
+
+.history-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(102, 234, 183, 0.7);
 }
 </style>

@@ -214,7 +214,10 @@ export default {
     <!-- 正常游戏界面 -->
     <template v-else>
       <TopBar :gameId="gameId" :mode="mode" :gameData="gameData" @game-resigned="handleGameResigned" />
-      <SideBar />
+      <SideBar 
+        :currentGameId="gameId"
+        :moveHistory="moves"
+      />
       <div v-if="!isLoading" class="board-area">
         <Board :gameId="gameId" :boardState="this.boardState" :moves="this.moves" :currentPlayer="this.currentPlayer"
           :userColor="this.userColor" :gameStatus="this.gameStatus" :gameResult="this.gameResult" :mode="this.mode"
