@@ -106,28 +106,6 @@ export default {
         return;
       }
 
-      let confirmMessage = '';
-      switch (this.mode) {
-        case 'game':
-          confirmMessage = 'Would you like to resign this game?';
-          break;
-        case 'learning':
-          confirmMessage = 'Would you like to exit this lesson?';
-          break;
-        case 'history':
-          confirmMessage = 'Would you like to exit replay mode?';
-          break;
-        default:
-          confirmMessage = 'Would you like to exit?';
-      }
-
-      // 确认对话框
-      console.log('显示确认对话框'); // 调试日志
-      if (!confirm(confirmMessage)) {
-        console.log('用户取消了操作'); // 调试日志
-        return;
-      }
-
       try {
         console.log('开始退出流程'); // 调试日志
         this.isResigning = true;
@@ -136,10 +114,8 @@ export default {
         if (this.mode === 'game') {
           // 只有对弈模式才调用认输API
           await game.resign(this.gameId);
-          alert('已认输，对局结束。');
         } else {
-          // 教学模式和历史模式直接退出
-          console.log(`退出${this.mode}模式`);
+          await game.resign(this.gameId);
         }
 
         // 发出认输事件给父组件
@@ -148,11 +124,7 @@ export default {
         console.log('操作成功'); // 调试日志
       } catch (error) {
         console.error('操作失败:', error);
-        if (this.mode === 'game') {
-          alert('认输失败，请重试。');
-        } else {
-          alert('退出失败，请重试。');
-        }
+        alert('resign failed: ' + (error.message || 'unknown error'));
       } finally {
         this.isResigning = false;
       }

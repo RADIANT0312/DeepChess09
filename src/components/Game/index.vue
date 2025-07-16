@@ -160,9 +160,9 @@ export default {
 
     handleGameResigned() {
       // 处理认输事件
-      console.log('游戏已认输');
-      // 跳转到结果页面或返回主页
-      this.$router.push('/main');
+      // 处理游戏结束逻辑
+      this.gameStatus = 'finished';
+      this.gameResult = 'loss';
     },
 
     handleUserInteraction() {
