@@ -4,9 +4,7 @@
       <div class="user-center-container">
         <header class="user-center-header">
           <h1>{{ profile.username }}</h1>
-        </header>
-
-        <section class="profile-section card">
+        </header>        <section class="profile-section card">
           <h2>Basic Information</h2>
           <div v-if="profile" class="profile-details">
             <div class="avatar-section">
@@ -15,11 +13,34 @@
                 <div v-else class="avatar-placeholder">No Avatar</div>
               </div>
               <div class="avatar-info">
-            <p><strong>User ID:</strong> <span class="profile-value">{{ profile.id }}</span></p>
-            <p><strong>Username:</strong> <span class="profile-value">{{ profile.username }}</span></p>
-            <!-- <p><strong>Email:</strong> <span class="profile-value">{{ profile.email }}</span></p> -->
-            <p><strong>Account Created At:</strong> <span class="profile-value">{{ formatDateTime(profile.createdAt)
-                }}</span></p>
+                <p><strong>User ID:</strong> <span class="profile-value">{{ profile.id }}</span></p>
+                <p><strong>Username:</strong> <span class="profile-value">{{ profile.username }}</span></p>
+                <!-- <p><strong>Email:</strong> <span class="profile-value">{{ profile.email }}</span></p> -->
+                <p><strong>Account Created At:</strong> <span class="profile-value">{{ formatDateTime(profile.createdAt)
+                    }}</span></p>
+              </div>
+            </div>
+
+            <!-- AI分析评价部分 -->
+            <div class="ai-analysis-section">
+              <h3 class="analysis-title">AI Analysis & Evaluation</h3>
+              <div v-if="isLoadingAnalysis" class="analysis-loading">
+                <div class="loading-spinner"></div>
+                <p>AI is analyzing your chess style and skill level...</p>
+              </div>
+              <div v-else-if="userAnalysis && userAnalysis.success" class="analysis-content">
+                <div class="analysis-item">
+                  <div class="analysis-text" v-html="formatAnalysisText(userAnalysis.analysis.ai_analysis)"></div>
+                </div>
+                <div class="analysis-timestamp">
+                  <small>Analysis generated: {{ formatDateTime(userAnalysis.timestamp) }}</small>
+                </div>
+              </div>
+              <div v-else-if="userAnalysisError" class="analysis-error">
+                <p>{{ userAnalysisError }}</p>
+              </div>
+              <div v-else class="analysis-empty">
+                <p>No analysis available. Play more games to generate AI evaluation.</p>
               </div>
             </div>
 
@@ -58,7 +79,8 @@
             <div class="stats-grid">
               <div class="stat-item full-width">
                 <span class="stat-label">Draw Rate:</span>
-                <span class="stat-value draw-rate">{{ (profile.stats.draws / profile.stats.totalGames * 100).toFixed(2) }}%</span>
+                <span class="stat-value draw-rate">{{ (profile.stats.draws / profile.stats.totalGames * 100).toFixed(2)
+                  }}%</span>
               </div>
             </div>
           </div>
@@ -103,7 +125,7 @@
                   <span class="game-result" :class="game.result">{{ getResultText(game.result) }}</span>
                   <span class="game-duration">{{ formatDuration(game.duration) }}</span>
                   <span class="game-color" :class="game.userColor">{{ game.userColor === 'white' ? 'White' : 'Black'
-                    }}</span>
+                  }}</span>
                   <button @click.stop="analyzeGame(game.gameId)" class="analyze-button" title="review">
                     review
                   </button>
@@ -168,6 +190,7 @@
 
 <script>
 import { user } from '@/api';
+import { marked } from 'marked';
 
 export default {
   name: 'ProfileIndex', // 组件名称
@@ -180,6 +203,10 @@ export default {
       profile: null,
       profileError: null,
       avatar: '',
+      // 添加用户分析相关状态
+      userAnalysis: null,
+      userAnalysisError: null,
+      isLoadingAnalysis: false,
       games: [],
       pagination: {
         page: 1,
@@ -199,6 +226,14 @@ export default {
     };
   },
   created() {
+    // 配置 marked 选项
+    marked.setOptions({
+      gfm: true, // 启用 GitHub Flavored Markdown
+      breaks: true, // 启用换行符转换为 <br>
+      sanitize: false, // 不过滤 HTML (Vue 会自动处理)
+      silent: true, // 静默模式，避免抛出错误
+    });
+
     if (this.testMode) {
       // 如果是测试模式，加载模拟数据
       this.loadMockData();
@@ -206,6 +241,7 @@ export default {
       // 否则，从 API 获取数据
       this.fetchProfile();
       this.fetchAvatar();
+      this.fetchUserAnalysis();
       this.fetchHistory();
     }
   },
@@ -227,9 +263,20 @@ export default {
         }
       };
       this.profileError = null;
-      
+
       // 设置模拟头像
       this.avatar = '/default-avatar.jpg';
+
+      // --- 模拟的用户分析数据 ---
+      this.userAnalysis = {
+        success: true,
+        analysis: {
+          ai_analysis: "根据您的对局历史分析，您是一位积极进攻型棋手，偏好主动出击和战术组合。您的技术水平处于中级到高级之间。在开局方面，您的理论基础较为扎实，熟悉多种开局体系；战术敏锐度较高，能够发现并执行组合；残局技巧不错，基本残局掌握良好。但在中局位置判断方面有时不够准确，时间管理需要改进，偶有时间压力下的失误，复杂局面的计算深度也有待提高。建议您多练习典型中局位置的判断，加强计算训练以提高战术视野，并学习时间分配策略来避免时间紧张的情况。"
+        },
+        timestamp: '2024-07-09T10:30:00Z'
+      };
+      this.userAnalysisError = null;
+      this.isLoadingAnalysis = false;
 
       // --- 模拟的 games 数据（游戏历史列表） ---
       this.games = [
@@ -360,7 +407,7 @@ export default {
     handleTopBarExpansion(isExpanded) {
       this.isTopBarExpanded = isExpanded;
     },
-    
+
     /**
      * 获取用户头像
      */
@@ -371,6 +418,29 @@ export default {
         console.error('Failed to fetch avatar:', error);
         // 如果获取失败，使用默认头像
         this.avatar = '/default-avatar.jpg';
+      }
+    },
+
+    /**
+     * 获取AI对用户的分析评价
+     */
+    async fetchUserAnalysis() {
+      this.isLoadingAnalysis = true;
+      this.userAnalysisError = null;
+      try {
+        const response = await user.getAnalysis();
+        this.userAnalysis = response.data;
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          this.userAnalysisError = 'Unauthorized. Please log in.';
+        } else if (error.response && error.response.status === 404) {
+          this.userAnalysisError = 'Analysis not available. Please play more games to generate analysis.';
+        } else {
+          this.userAnalysisError = 'Failed to fetch user analysis. Please try again later.';
+          console.error('Error fetching user analysis:', error);
+        }
+      } finally {
+        this.isLoadingAnalysis = false;
       }
     },
     /**
@@ -484,6 +554,33 @@ export default {
     },
 
     /**
+     * 使用 marked 库格式化分析文本
+     * @param {string} text - 原始分析文本
+     * @returns {string} 格式化后的HTML文本
+     */
+    formatAnalysisText(text) {
+      if (!text) return '';
+      
+      try {
+        // 使用 marked 解析 Markdown
+        let html = marked.parse(text);
+      
+        // 移除多余的空白字符和空行
+        html = html
+          .replace(/\n\s*\n/g, '\n') // 移除连续的空行
+          .replace(/>\s+</g, '><')    // 移除标签间的空白
+          .replace(/\s+/g, ' ')       // 将多个空格压缩为单个空格
+          .trim();                    // 移除首尾空白
+        
+        return html;
+      } catch (error) {
+        console.error('Error parsing markdown:', error);
+        // 如果解析失败，返回原始文本并进行基本的换行处理
+        return text.replace(/\n/g, '<br>');
+      }
+    },
+
+    /**
      * Returns a user-friendly text for game results.
      * @param {string} result - The game result ('win', 'loss', 'draw').
      * @returns {string} The display text for the result.
@@ -555,6 +652,14 @@ export default {
   /* 在 flex 布局中允许收缩 */
   max-height: calc(100vh - 120px);
   /* 设置最大高度，减去顶部padding和margin */
+  
+  /* 隐藏滚动条 */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.user-center-container::-webkit-scrollbar {
+  display: none; /* WebKit browsers */
 }
 
 /* 页面头部样式 */
@@ -1047,13 +1152,13 @@ h2 {
   .profile-value {
     margin-top: 5px;
   }
-  
+
   .avatar-section {
     flex-direction: column;
     text-align: center;
     gap: 15px;
   }
-  
+
   .user-avatar,
   .avatar-placeholder {
     width: 60px;
@@ -1113,7 +1218,7 @@ h2 {
     font-size: 0.9em;
     padding: 8px 12px;
   }
-  
+
   .user-avatar,
   .avatar-placeholder {
     width: 50px;
@@ -1146,5 +1251,236 @@ h2 {
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+/* AI分析评价样式 */
+.ai-analysis-section {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  border: 1px solid #e9ecef;
+}
+
+.analysis-title {
+  color: #2c3e50;
+  font-size: 1.4em;
+  margin-bottom: 20px;
+  font-weight: 600;
+  border-bottom: 2px solid #819A91;
+  padding-bottom: 8px;
+}
+
+.analysis-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px;
+  color: #6c757d;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #819A91;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.analysis-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.analysis-item {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 4px solid #819A91;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.analysis-text {
+  color: #495057;
+  font-size: 1.05em;
+  line-height: 1.6;
+  margin: 0;
+  text-align: justify;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.analysis-text h1,
+.analysis-text h2,
+.analysis-text h3,
+.analysis-text h4,
+.analysis-text h5,
+.analysis-text h6 {
+  color: #2c3e50;
+  margin: 20px 0 10px 0;
+  font-weight: 600;
+}
+
+.analysis-text h1 {
+  font-size: 1.4em;
+  border-bottom: 2px solid #819A91;
+  padding-bottom: 5px;
+}
+
+.analysis-text h2 {
+  font-size: 1.3em;
+  border-bottom: 1px solid #819A91;
+  padding-bottom: 3px;
+}
+
+.analysis-text h3 {
+  font-size: 1.2em;
+}
+
+.analysis-text p {
+  margin: 10px 0;
+}
+
+.analysis-text strong {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.analysis-text em {
+  font-style: italic;
+  color: #6c757d;
+}
+
+.analysis-text code {
+  background-color: #f8f9fa;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: '宋体';
+  font-size: 0.9em;
+}
+
+.analysis-text pre {
+  background-color: #f8f9fa;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  overflow-x: auto;
+  margin: 10px 0;
+}
+
+.analysis-text pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+.analysis-text blockquote {
+  border-left: 4px solid #819A91;
+  margin: 15px 0;
+  padding: 0 15px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.analysis-text ul,
+.analysis-text ol {
+  margin: 10px 0;
+  padding-left: 25px;
+}
+
+.analysis-text li {
+  margin: 5px 0;
+}
+
+.analysis-text table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 15px 0;
+}
+
+.analysis-text th,
+.analysis-text td {
+  border: 1px solid #dee2e6;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.analysis-text th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+.analysis-text a {
+  color: #819A91;
+  text-decoration: none;
+}
+
+.analysis-text a:hover {
+  text-decoration: underline;
+}
+
+.analysis-divider {
+  border: none;
+  border-top: 1px solid #dee2e6;
+  margin: 20px 0;
+}
+
+.analysis-timestamp {
+  text-align: right;
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid #e9ecef;
+}
+
+.analysis-timestamp small {
+  color: #6c757d;
+  font-style: italic;
+}
+
+.analysis-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #f5c6cb;
+  text-align: center;
+}
+
+.analysis-empty {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #ffeaa7;
+  text-align: center;
+  font-style: italic;
+}
+
+/* 响应式调整 - AI分析部分 */
+@media (max-width: 768px) {
+  .ai-analysis-section {
+    margin-top: 20px;
+    padding: 15px;
+  }
+  
+  .analysis-title {
+    font-size: 1.2em;
+  }
+  
+  .analysis-item {
+    padding: 15px;
+  }
+  
+  .analysis-text {
+    font-size: 1em;
+  }
 }
 </style>

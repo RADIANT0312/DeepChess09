@@ -52,4 +52,12 @@ export const user = {
   getGameDetails: (gameId) => {
     return apiClient.get(`/user/history/${gameId}`);
   },
+
+  /**
+   * 获取AI对用户的棋风和技术水平分析
+   * @returns {Promise} API 响应
+   */
+  getAnalysis: () => {
+    return apiClient.get("/user/analysis");
+  },
 };
