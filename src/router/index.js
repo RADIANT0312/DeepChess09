@@ -61,13 +61,15 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const loggedIn = localStorage.getItem("token");
 
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!loggedIn) {
       next({ name: "Login" });
     } else {
+      // 如果有token，可以选择性地验证token有效性
+      // 但考虑到性能，我们依赖API调用时的401拦截器来处理token过期
       next();
     }
   } else if (to.matched.some((record) => record.meta.requiresGuest)) {

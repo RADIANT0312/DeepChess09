@@ -1,5 +1,8 @@
 import axios from "axios";
 
+// 防止重复跳转的标志
+let isRedirecting = false;
+
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api", // 使用环境变量或默认值
   headers: {
@@ -31,9 +34,36 @@ apiClient.interceptors.response.use(
     if (error.response) {
       switch (error.response.status) {
         case 401:
-          // 未授权，可能需要重新登录
-          console.warn("未授权访问，请重新登录");
-          // 这里可以添加重定向到登录页面的逻辑
+          // 未授权，token过期或无效，需要重新登录
+          console.warn("未授权访问，token已过期，正在跳转到登录页面");
+          
+          // 防止重复跳转
+          if (!isRedirecting) {
+            isRedirecting = true;
+            
+            // 清除无效的token和用户信息
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            
+            // 动态导入router来避免循环依赖
+            import("@/router/index.js").then((routerModule) => {
+              const router = routerModule.default;
+              // 跳转到登录页面
+              router.push({ name: "Login" }).finally(() => {
+                // 跳转完成后重置标志
+                setTimeout(() => {
+                  isRedirecting = false;
+                }, 1000);
+              });
+            }).catch((routerError) => {
+              console.error("无法导入路由模块:", routerError);
+              // 备用方案：直接使用window.location
+              window.location.href = "/login";
+              setTimeout(() => {
+                isRedirecting = false;
+              }, 1000);
+            });
+          }
           break;
         case 403:
           console.warn("访问被禁止");
