@@ -9,11 +9,19 @@
         <section class="profile-section card">
           <h2>Basic Information</h2>
           <div v-if="profile" class="profile-details">
+            <div class="avatar-section">
+              <div class="avatar-wrapper">
+                <img v-if="avatar" :src="avatar" alt="User Avatar" class="user-avatar" />
+                <div v-else class="avatar-placeholder">No Avatar</div>
+              </div>
+              <div class="avatar-info">
             <p><strong>User ID:</strong> <span class="profile-value">{{ profile.id }}</span></p>
             <p><strong>Username:</strong> <span class="profile-value">{{ profile.username }}</span></p>
             <!-- <p><strong>Email:</strong> <span class="profile-value">{{ profile.email }}</span></p> -->
             <p><strong>Account Created At:</strong> <span class="profile-value">{{ formatDateTime(profile.createdAt)
                 }}</span></p>
+              </div>
+            </div>
 
           </div>
           <p v-else-if="profileError" class="error-message">{{ profileError }}</p>
@@ -171,6 +179,7 @@ export default {
       testMode: false, // 设置为 true 来使用模拟数据，false 来调用 API
       profile: null,
       profileError: null,
+      avatar: '',
       games: [],
       pagination: {
         page: 1,
@@ -196,6 +205,7 @@ export default {
     } else {
       // 否则，从 API 获取数据
       this.fetchProfile();
+      this.fetchAvatar();
       this.fetchHistory();
     }
   },
@@ -217,6 +227,9 @@ export default {
         }
       };
       this.profileError = null;
+      
+      // 设置模拟头像
+      this.avatar = '/default-avatar.jpg';
 
       // --- 模拟的 games 数据（游戏历史列表） ---
       this.games = [
@@ -346,6 +359,19 @@ export default {
      */
     handleTopBarExpansion(isExpanded) {
       this.isTopBarExpanded = isExpanded;
+    },
+    
+    /**
+     * 获取用户头像
+     */
+    async fetchAvatar() {
+      try {
+        this.avatar = await user.getAvatar();
+      } catch (error) {
+        console.error('Failed to fetch avatar:', error);
+        // 如果获取失败，使用默认头像
+        this.avatar = '/default-avatar.jpg';
+      }
     },
     /**
      * Fetches the user's profile information and statistics.
@@ -593,6 +619,59 @@ h2 {
 .profile-value {
   font-weight: 600;
   color: #000000;
+}
+
+/* 头像部分样式 */
+.avatar-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.avatar-wrapper {
+  flex-shrink: 0;
+}
+
+.user-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #819A91;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.user-avatar:hover {
+  transform: scale(1.05);
+}
+
+.avatar-placeholder {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6c757d;
+  font-size: 0.8rem;
+  text-align: center;
+  border: 3px solid #ddd;
+}
+
+.avatar-info {
+  flex-grow: 1;
+}
+
+.avatar-info p {
+  margin: 10;
+  word-break: break-all;
 }
 
 .stats-grid {
@@ -968,6 +1047,18 @@ h2 {
   .profile-value {
     margin-top: 5px;
   }
+  
+  .avatar-section {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+  
+  .user-avatar,
+  .avatar-placeholder {
+    width: 60px;
+    height: 60px;
+  }
 
   .stats-grid {
     grid-template-columns: 1fr;
@@ -1021,6 +1112,12 @@ h2 {
   .pagination-button {
     font-size: 0.9em;
     padding: 8px 12px;
+  }
+  
+  .user-avatar,
+  .avatar-placeholder {
+    width: 50px;
+    height: 50px;
   }
 }
 
