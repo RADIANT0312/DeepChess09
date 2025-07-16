@@ -30,6 +30,8 @@ export default {
       // 通用游戏数据
       boardState: '',
       moves: [],
+      aiCommentContent: [],
+      isAiShouldShow: false,
       currentPlayer: '',
       userColor: '',
       gameStatus: 'ongoing',
@@ -45,7 +47,7 @@ export default {
   },
   async created() {
     // 从路由参数获取mode和gameId
-    this.mode = this.$route.query.mode || this.$route.params.mode;
+    this.mode = this.$route.query.rmode || this.$route.params.mode;
     this.gameId = this.$route.query.gameId || this.$route.params.gameId;
 
     console.log('Game组件初始化:', { mode: this.mode, gameId: this.gameId });
@@ -73,10 +75,15 @@ export default {
         this.loadError = null;
 
         switch (this.mode) {
+          // case 'teaching':
+            // console.log('初始化教学模式');
+            // await (this.isAiShouldShow = true);
+            // await this.initGameMode();
+            // break;
           case 'game':
             await this.initGameMode();
             break;
-          case 'learning':
+          case 'teaching':
             await this.initLearningMode();
             break;
           case 'history':
@@ -97,7 +104,6 @@ export default {
     async initGameMode() {
       console.log('初始化对弈模式, gameId:', this.gameId);
       const response = await game.getGameState(this.gameId);
-      console.log('获取对弈状态1');
       const data = response.data;
 
       this.gameData = data;
@@ -123,6 +129,8 @@ export default {
       this.objectives = data.objectives || [];
       this.hints = data.hints || [];
       this.title = data.title;
+      this.isAiShouldShow = true; // 教学模式总是显示AI评论
+      this.aiCommentContent = [];
       this.description = data.description;
       this.gameStatus = 'ongoing';
       this.gameResult = 'ongoing';
@@ -179,6 +187,11 @@ export default {
       // 处理游戏结束逻辑
       this.gameStatus = 'finished';
       this.gameResult = result;
+    },
+
+    handleaiComment(comment) {
+      // 处理AI评论
+      this.aiCommentContent.push(comment);
     }
 
   }
@@ -214,14 +227,17 @@ export default {
     <!-- 正常游戏界面 -->
     <template v-else>
       <TopBar :gameId="gameId" :mode="mode" :gameData="gameData" @game-resigned="handleGameResigned" />
-      <SideBar 
-        :currentGameId="gameId"
+      <div v-if="!isLoading">
+        <SideBar :currentGameId="gameId"
         :moveHistory="moves"
-      />
+        :aiCommentContent="aiCommentContent"
+        :isAiShouldShow="isAiShouldShow"
+        />
+      </div> 
       <div v-if="!isLoading" class="board-area">
         <Board :gameId="gameId" :boardState="this.boardState" :moves="this.moves" :currentPlayer="this.currentPlayer"
           :userColor="this.userColor" :gameStatus="this.gameStatus" :gameResult="this.gameResult" :mode="this.mode"
-          @move="handleMove" @gameOver="handleGameOver" />
+          @move="handleMove" @gameOver="handleGameOver" @aiComment="handleaiComment" />
       </div>
 
     </template>

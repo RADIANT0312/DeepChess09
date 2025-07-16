@@ -22,12 +22,22 @@
         </button>
       </div>
       <div class="choose-options-row">
-        <label>AI Difficulty:</label>
-        <select v-model="difficulty">
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="hard">Hard</option>
-        </select>
+        <template v-if="mode === 'game'">
+          <label>AI Difficulty:</label>
+          <select v-model="difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </template>
+        <template v-else-if="mode === 'teaching'">
+          <label>Lesson Type:</label>
+          <select v-model="lesson_type">
+            <option value="opening">Opening</option>
+            <option value="general">General</option>
+            <option value="endgame">Endgame</option>
+          </select>
+        </template>
       </div>
       <div class="choose-options-actions">
         <button class="color-btn notready" @click="goToMain" :disabled="isCreatingGame">I'm not ready</button>
@@ -50,6 +60,7 @@ export default {
       mode: this.$route.query.mode || 'game',
       color: '',
       difficulty: 'medium',
+      lesson_type: 'opening',
       isCreatingGame: false, // 添加loading状态
     };
   },
@@ -64,8 +75,9 @@ export default {
 
       try {
         // 调用 API 创建游戏
+        console.log('开始创建游戏:', { mode: this.mode, color: this.color, difficulty: this.difficulty, lesson_type: this.lesson_type });
         const response = this.mode === 'teaching'
-          ? await game.createMatch({ color: this.color, difficulty: this.difficulty })
+          ? await teaching.createLesson({ color: this.color, lesson_type: this.lesson_type })
           // TODO: 这里按理说应该是teaching.createTeaching, 或者getLessons获得一些课程的信息
           // 但目前没有相关的API，所以暂时使用createMatch，因此当前版本下 game和teaching的创建逻辑是一样的
           // 区别在于渲染时 game 不会渲染 ai comment, teaching 会
@@ -74,7 +86,9 @@ export default {
         const { gameId } = response.data;
 
         // 直接跳转到 API 游戏页面
-        window.location.href = `/game/game/${gameId}?rmode=${this.mode}`;
+        window.location.href = this.mode === 'teaching'
+          ? `/game/teaching/${gameId}?rmode=${this.mode}`
+          : `/game/game/${gameId}?rmode=${this.mode}`;
       } catch (error) {
         console.error('创建游戏失败:', error);
         // 可以在这里添加错误提示

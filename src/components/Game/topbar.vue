@@ -115,7 +115,9 @@ export default {
           // 只有对弈模式才调用认输API
           await game.resign(this.gameId);
         } else {
-          await game.resign(this.gameId);
+          // await game.resign(this.gameId);
+          console.log('非对弈模式，直接退出'); // 调试日志
+          this.$router.push('/main'); // 直接跳转到主页面
         }
 
         // 发出认输事件给父组件

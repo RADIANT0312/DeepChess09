@@ -8,8 +8,8 @@ export const teaching = {
    * 获取所有可用的教学课程列表
    * @returns {Promise} API 响应
    */
-  getLessons: () => {
-    return apiClient.get("/teaching/lessons");
+  createLesson: (lessonConfig) => {
+    return apiClient.post("/teaching/start", lessonConfig);
   },
 
   /**

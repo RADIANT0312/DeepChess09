@@ -11,7 +11,6 @@ const routes = [
     path: "/",
     name: "Start",
     component: Start,
-    meta: { requiresGuest: true }, // Only accessible to unauthenticated users
   },
   {
     path: "/main",

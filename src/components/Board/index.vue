@@ -12,7 +12,7 @@ import { game, teaching } from '@/api';
 
 export default {
   name: 'Board',
-  emits: ['move', 'gameOver'],
+  emits: ['move', 'gameOver', 'aiComment'],
   props: {
     gameId: {
       type: String,
@@ -59,6 +59,7 @@ export default {
       lastMove: null,
       autoplayInterval: null,
       moveHistory: [],  // 在组件内部维护移动历史
+      commentIndex: 0, // 用于跟踪AI评论的索引
       lastTurn: null    // 记录上一次的回合，用于检测回合切换
     }
   },
@@ -70,9 +71,11 @@ export default {
     if (this.userColor === 'white') {
       this.autoWhite = false;
       this.autoBlack = true;
+      this.commentIndex = 0;
     } else {
       this.autoWhite = true;
       this.autoBlack = false;
+      this.commentIndex = 1;
     }
 
     // if (this.mode === 'learning') {
@@ -162,7 +165,9 @@ export default {
         // console.log(isFirstCallInTurn, ' = ', this.lastTurn, ' !== ', this.game.turn);
         if (isFirstCallInTurn) {
           
-          game.makeMove(this.gameId, this.getLastMove().toLowerCase()).then(ai_move_data => {
+            // 根据模式选择不同的API模块
+            const apiModule = this.mode === 'teaching' ? teaching : game;
+            apiModule.makeMove(this.gameId, this.getLastMove().toLowerCase()).then(ai_move_data => {
             // console.log('Next move from server:', ai_move_data.data);
             const ai_position = ai_move_data.data.aiMove;
             const ai_position_1 = {
@@ -178,6 +183,13 @@ export default {
             // console.log('AI Position 2:', ai_position_2);
             this.view.handleTileClick(ai_position_2);
 
+            console.log('AI comment:', ai_move_data.data.aiAnalysis);
+            console.log('AI comment 2: ', ai_move_data.data.userAnalysis);
+            this.$emit('aiComment', { moveIndex: this.commentIndex, text: ai_move_data.data.userAnalysis });
+            this.commentIndex++;
+            this.$emit('aiComment', { moveIndex: this.commentIndex, text: ai_move_data.data.aiAnalysis });
+            this.commentIndex++;
+
             const backend_result = ai_move_data.data.result;
             if (backend_result === 'ongoing') {
               console.log('Game ongoing, waiting for next move...');
@@ -190,6 +202,9 @@ export default {
             } else if (backend_result === 'draw') {
               console.log('Game ended in a draw:', ai_move_data.data.result);
               this.$emit('gameOver', 'draw');
+            } else if (backend_result === 'finished') {
+              console.log('Game ended in a finished:', ai_move_data.data.result);
+              this.$emit('gameOver', 'finished');
             } else {
               console.error('Unexpected game result:', backend_result);
             }

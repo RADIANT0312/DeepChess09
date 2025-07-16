@@ -11,13 +11,13 @@
       </div>
 
       <div class="main-content-area">
-        <div class="button-row">
+        <div class="button-row" :class="{ 'single-button': !isAiShouldShow }">
           <button class="AIbutton" style="font-style: italic;" 
             :class="{ 'active-button': activeWorkplace === 'history' }"
             @click="toggleWorkplace('history')">
             History
           </button>
-          <button class="AIbutton" style="font-style: italic;"
+          <button v-if="isAiShouldShow" class="AIbutton" style="font-style: italic;"
             :class="{ 'active-button': activeWorkplace === 'AIcomment' }"
             @click="toggleWorkplace('AIcomment')">
             AI Comment
@@ -28,9 +28,16 @@
           <p v-if="isLoadingHistory" class="loading-text">Loading history...</p>
           <p v-else-if="historyError" class="error-message">{{ historyError }}</p>
           <div v-else-if="moveHistory.length" class="history-container">
-            <div v-for="(item, index) in moveHistory" :key="index" class="move-item">
+            <div v-for="(item, index) in moveHistory" :key="index" 
+                 class="move-item" 
+                 :class="{ 
+                   'selected': selectedMoveIndex === index,
+                   'has-comment': hasCommentForMove(index)
+                 }"
+                 @click="selectMove(index)">
               <span class="move-number">{{ Math.floor(index / 2) + 1 }}{{ index % 2 === 0 ? '.' : '...' }}</span>
               <span class="move-notation">{{ item }}</span>
+              <span v-if="hasCommentForMove(index)" class="comment-indicator">💬</span>
             </div>
           </div>
           <p v-else class="no-history">No game history available yet.</p>
@@ -38,15 +45,24 @@
 
         <div class="workplace" v-show="activeWorkplace === 'AIcomment'">
           <h3>AI Analysis:</h3>
-          <p v-if="!gameId" class="work-word">No active game to show AI comments for. Create a match first.</p>
-          <p v-else-if="isLoadingAIComment">Loading AI comments...</p>
-          <p v-else-if="aiCommentError" class="error-message">{{ aiCommentError }}</p>
-          <div v-else-if="aiCommentContent.length">
-            <p v-for="item in aiCommentContent" :key="item.id" class="work-word">
-              {{ item.text }}
-            </p>
+          <div class="ai-comment-container">
+            <div v-if="selectedMoveIndex === null" class="no-selection">
+              <p class="work-word">Please select a move from the history first to view AI comments.</p>
+            </div>
+            <div v-else-if="!hasCommentForMove(selectedMoveIndex)" class="no-comment">
+              <p class="work-word">No AI comment available for move {{ Math.floor(selectedMoveIndex / 2) + 1 }}{{ selectedMoveIndex % 2 === 0 ? '' : '...' }} {{ moveHistory[selectedMoveIndex] }}.</p>
+              <p class="work-word" style="font-size: 12px; opacity: 0.7;">AI analysis may be processed later.</p>
+            </div>
+            <div v-else class="comment-content">
+              <div class="selected-move-info">
+                <span class="move-label">Move {{ Math.floor(selectedMoveIndex / 2) + 1 }}{{ selectedMoveIndex % 2 === 0 ? '' : '...' }}</span>
+                <span class="move-value">{{ moveHistory[selectedMoveIndex] }}</span>
+              </div>
+              <div class="ai-comment-text">
+                <p class="work-word">{{ getCommentForMove(selectedMoveIndex) }}</p>
+              </div>
+            </div>
           </div>
-          <p v-else>No AI comments available yet.</p>
         </div>
       </div>
       <div class="footer">
@@ -74,6 +90,14 @@ export default {
       type: Array,
       default: () => [],
     },
+    aiCommentContent: {
+      type: Array,
+      default: () => [],
+    },
+    isAiShouldShow: {
+      type: Boolean,
+      default: false,
+    }
   },
   data() {
     return {
@@ -86,11 +110,11 @@ export default {
       activeWorkplace: null,
       gameId: null,
       isLoadingAIComment: false,
-      aiCommentContent: [],
       aiCommentError: null,
       isLoadingHistory: false,
       historyContent: [],
       historyError: null,
+      selectedMoveIndex: null, // 当前选中的移动索引
     }
   },
   emits: ['expansion-change', 'resign-game'],
@@ -125,6 +149,7 @@ export default {
     }
   },
   mounted() {
+    console.log(`isAiShouldShow = ${this.isAiShouldShow}`);
     this.startTimeUpdater();
     this.position.top = window.innerHeight * 0.05;
     this.position.right = 15;
@@ -247,6 +272,28 @@ export default {
           }, 3000);
         }
       }
+    },
+
+    // 选中特定的移动
+    selectMove(index) {
+      this.selectedMoveIndex = index;
+    },
+
+    // 检查指定移动是否有评论
+    hasCommentForMove(index) {
+      if (!this.aiCommentContent || !Array.isArray(this.aiCommentContent)) {
+        return false;
+      }
+      return this.aiCommentContent.some(comment => comment.moveIndex === index);
+    },
+
+    // 获取指定移动的评论
+    getCommentForMove(index) {
+      if (!this.aiCommentContent || !Array.isArray(this.aiCommentContent)) {
+        return '';
+      }
+      const comment = this.aiCommentContent.find(comment => comment.moveIndex === index);
+      return comment ? comment.text : '';
     },
 
   }
@@ -471,6 +518,15 @@ export default {
   justify-content: space-between;
 }
 
+.button-row.single-button {
+  justify-content: center;
+}
+
+.button-row.single-button .AIbutton {
+  flex: none;
+  width: 100%;
+}
+
 /* AIbutton styles */
 .AIbutton {
   flex: 1; /* 让按钮平均分配宽度 */
@@ -566,6 +622,8 @@ export default {
   border-radius: 4px;
   transition: background-color 0.2s ease;
   font-family: 'Courier New', monospace;
+  cursor: pointer;
+  position: relative;
 }
 
 .move-item:hover {
@@ -574,6 +632,25 @@ export default {
 
 .move-item:nth-child(odd) {
   background: rgba(255, 255, 255, 0.02);
+}
+
+/* 选中状态的样式 */
+.move-item.selected {
+  background: rgba(102, 234, 183, 0.2) !important;
+  border: 1px solid rgba(102, 234, 183, 0.4);
+  box-shadow: 0 0 6px rgba(102, 234, 183, 0.3);
+}
+
+/* 有评论的移动样式 */
+.move-item.has-comment {
+  border-left: 3px solid #66eab7;
+}
+
+/* 评论指示器样式 */
+.comment-indicator {
+  margin-left: auto;
+  font-size: 12px;
+  opacity: 0.8;
 }
 
 /* 最新移动记录的高亮样式 */
@@ -660,5 +737,86 @@ export default {
 
 .history-container::-webkit-scrollbar-thumb:hover {
   background: rgba(102, 234, 183, 0.7);
+}
+
+/* Custom scrollbar for AI comment container */
+.ai-comment-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ai-comment-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.ai-comment-container::-webkit-scrollbar-thumb {
+  background: rgba(102, 234, 183, 0.5);
+  border-radius: 2px;
+}
+
+.ai-comment-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(102, 234, 183, 0.7);
+}
+
+/* AI Comment 相关样式 */
+.ai-comment-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 5px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.02);
+  scroll-behavior: smooth;
+}
+
+.no-selection, .no-comment {
+  text-align: center;
+  padding: 20px;
+}
+
+.comment-content {
+  padding: 10px;
+}
+
+.selected-move-info {
+  background: rgba(102, 234, 183, 0.1);
+  border: 1px solid rgba(102, 234, 183, 0.3);
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.move-label {
+  color: #66eab7;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.move-value {
+  color: #e0e0e0;
+  font-family: 'Courier New', monospace;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.ai-comment-text {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  padding: 12px;
+  border-left: 3px solid #66eab7;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap; /* 保持换行符和空格 */
+}
+
+.ai-comment-text .work-word {
+  text-align: left;
+  font-style: normal;
+  line-height: 1.5;
+  margin: 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 </style>
