@@ -1,8 +1,7 @@
 <template>
   <transition name="celebration-fade-scale">
-    <div v-if="internalShow" class="chess-celebration-overlay" @click.self="closeOverlay">
+    <div v-if="internalShow" class="chess-celebration-overlay">
       <div class="celebration-card" :class="outcomeType">
-        <button class="close-button" @click="closeOverlay">×</button>
 
         <div class="light-effect"></div>
 
@@ -14,11 +13,11 @@
           <br />
 
           <div class="actions">
-            <router-link to="/game">
-              <button class="action-button rematch-button" @click="handleRematchClick">Rematch</button>
+            <router-link :to="{ path: '/select-mode', query: { mode: mode } }">
+              <button class="action-button rematch-button">Rematch</button>
             </router-link>
             <router-link to="/main">
-              <button class="action-button exit-button" @click="handleExitClick">Back to Lobby</button>
+              <button class="action-button exit-button">Back to Lobby</button>
             </router-link>
           </div>
         </div>
@@ -28,7 +27,7 @@
 </template>
 
 <script>
-import { user } from '../../api';
+import { user } from '@/api';
 
 export default {
   name: 'ChessOutcomeCelebration',
@@ -38,14 +37,15 @@ export default {
     outcomeType: {
       type: String,
       default: 'win', // 默认显示胜利效果，方便测试
-      validator: (value) => ['win', 'lose', 'draw', ''].includes(value)
+      validator: (value) => ['win', 'loss', 'draw', ''].includes(value)
     }
   },
   data() {
     return {
       // 这是关键：使用 internalShow 作为组件内部的响应式数据，控制自身的可见性。
       internalShow: true, // 默认值为 true，表示组件被渲染时就可见
-      avatar: '/default-avatar.jpg' // 添加头像数据
+      avatar: '/default-avatar.jpg', // 添加头像数据
+      mode: 'gaming' // 默认模式为 gaming
     };
   },
   computed: {
@@ -54,7 +54,7 @@ export default {
       switch (this.outcomeType) {
         case 'win':
           return 'VICTORY!';
-        case 'lose':
+        case 'loss':
           return 'DEFEAT!';
         case 'draw':
           return 'DRAW!';
@@ -64,32 +64,14 @@ export default {
     },
   },
   mounted() {
+    // 从路由中获取 rmode 参数
+    this.mode = this.$route.query.rmode || 'game'; // 默认值为 'game'
     this.fetchAvatar();
   },
   methods: {
     async fetchAvatar() {
       this.avatar = await user.getAvatar();
     },
-    // closeOverlay 方法现在直接修改 internalShow 数据
-    closeOverlay() {
-      this.internalShow = false; // 直接将 internalShow 设置为 false，组件就会从 DOM 中移除
-      // 此时不再需要 `this.$emit('update:show', false);`，
-      // 因为父组件没有监听这个 prop。
-      // 但是，如果你希望父组件在组件关闭时能收到通知（例如记录日志），
-      // 仍然可以保留 `this.$emit('close');` 事件。
-      this.$emit('close'); // 仍然可以发出 'close' 事件，作为通知
-      console.log('Celebration component closed.');
-    },
-    handleRematchClick() {
-      console.log('Rematch clicked!');
-      this.$emit('rematch'); // 触发 rematch 事件给父组件
-      this.closeOverlay(); // 调用内部关闭逻辑
-    },
-    handleExitClick() {
-      console.log('Back to Lobby clicked!');
-      this.$emit('exit'); // 触发 exit 事件给父组件
-      this.closeOverlay(); // 调用内部关闭逻辑
-    }
   },
   // 不再需要 watch 属性，因为不再依赖外部状态来控制显示
 };
@@ -199,7 +181,7 @@ export default {
   text-shadow: 0 0 15px rgba(139, 195, 74, 0.8);
 }
 
-.celebration-card.lose .outcome-text {
+.celebration-card.loss .outcome-text {
   /* color: #f44333; */
   text-shadow: 0 0 15px rgba(244, 67, 51, 0.8);
 }

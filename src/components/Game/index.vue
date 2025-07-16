@@ -2,6 +2,7 @@
 import SideBar from '@components/SideBarGame/index.vue';
 import Board from '@components/Board/index.vue';
 import TopBar from './topbar.vue';
+import Popup from '@components/Popup/index.vue';
 import { game } from '@/api/game.js';
 import { teaching } from '@/api/teaching.js';
 
@@ -10,6 +11,7 @@ export default {
   components: {
     SideBar,
     Board,
+    Popup,
     TopBar
   },
   data() {
@@ -166,7 +168,19 @@ export default {
     handleUserInteraction() {
       // 用户有操作时重置超时计时器
       this.resetTimeout();
+    },
+
+    handleMove(move) {
+      // 处理用户的走棋操作
+      this.moves.push(move);
+    },
+
+    handleGameOver(result) {
+      // 处理游戏结束逻辑
+      this.gameStatus = 'finished';
+      this.gameResult = result;
     }
+
   }
 }
 </script>
@@ -203,10 +217,14 @@ export default {
       <SideBar />
       <div v-if="!isLoading" class="board-area">
         <Board :gameId="gameId" :boardState="this.boardState" :moves="this.moves" :currentPlayer="this.currentPlayer"
-          :userColor="this.userColor" :gameStatus="this.gameStatus" :gameResult="this.gameResult" :mode="this.mode" />
+          :userColor="this.userColor" :gameStatus="this.gameStatus" :gameResult="this.gameResult" :mode="this.mode"
+          @move="handleMove" @gameOver="handleGameOver" />
       </div>
 
     </template>
+
+  <Popup v-if="gameStatus === 'finished'" :outcome-type="gameResult"/>
+
   </div>
 </template>
 

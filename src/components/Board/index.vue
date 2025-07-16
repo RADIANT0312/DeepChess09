@@ -12,6 +12,7 @@ import { game, teaching } from '@/api';
 
 export default {
   name: 'Board',
+  emits: ['move', 'gameOver'],
   props: {
     gameId: {
       type: String,
@@ -57,7 +58,8 @@ export default {
       control: null,
       lastMove: null,
       autoplayInterval: null,
-      moveHistory: []  // 在组件内部维护移动历史
+      moveHistory: [],  // 在组件内部维护移动历史
+      lastTurn: null    // 记录上一次的回合，用于检测回合切换
     }
   },
   mounted() {
@@ -152,41 +154,52 @@ export default {
 
     autoplayTick() {
       const shouldAutoplay = this.game.turn === "WHITE" ? this.autoWhite : this.autoBlack;
-
-      // console.log(shouldAutoplay)
+      // console.log('shouldAutoplay ?', shouldAutoplay)
       if (shouldAutoplay) {
         // 检查是否是当前回合的第一次调用
         const isFirstCallInTurn = this.lastTurn !== this.game.turn;
-
+        // console.log('isFirstCallInTurn = this.lastTurn !== this.game.turn;');
+        // console.log(isFirstCallInTurn, ' = ', this.lastTurn, ' !== ', this.game.turn);
         if (isFirstCallInTurn) {
-          this.lastTurn = this.game.turn;
+          
           game.makeMove(this.gameId, this.getLastMove().toLowerCase()).then(ai_move_data => {
-            console.log('Next move from server:', ai_move_data.data);
+            // console.log('Next move from server:', ai_move_data.data);
             const ai_position = ai_move_data.data.aiMove;
-            const ai_position_1 = ai_position.slice(0, 2);
-            const ai_position_1_transformed = {
-              col: ai_position_1.charAt(0).toUpperCase(),
-              row: ai_position_1.charAt(1)
+            const ai_position_1 = {
+              col: ai_position.slice(0, 2).charAt(0).toUpperCase(),
+              row: ai_position.slice(0, 2).charAt(1)
             };
-            const ai_position_2 = ai_position.slice(2, 4);
-            const ai_position_2_transformed = {
-              col: ai_position_2.charAt(0).toUpperCase(),
-              row: ai_position_2.charAt(1)
+            const ai_position_2 = {
+              col: ai_position.slice(2, 4).charAt(0).toUpperCase(),
+              row: ai_position.slice(2, 4).charAt(1)
             };
-            console.log('AI Position 1:', ai_position_1_transformed);
-            // this.view.handleTileClick(ai_position_1_transformed);
-            console.log('AI Position 2:', ai_position_2_transformed);
-            // this.view.handleTileClick(ai_position_2_transformed);
+            // console.log('AI Position 1:', ai_position_1);
+            this.view.handleTileClick(ai_position_1);
+            // console.log('AI Position 2:', ai_position_2);
+            this.view.handleTileClick(ai_position_2);
 
+            const backend_result = ai_move_data.data.result;
+            if (backend_result === 'ongoing') {
+              console.log('Game ongoing, waiting for next move...');
+            } else if (backend_result === 'win') {
+              console.log('Game over, result:', ai_move_data.data.result);
+              this.$emit('gameOver', 'win');
+            } else if (backend_result === 'loss') {
+              console.log('Game over, result:', ai_move_data.data.result);
+              this.$emit('gameOver', 'loss');
+            } else if (backend_result === 'draw') {
+              console.log('Game ended in a draw:', ai_move_data.data.result);
+              this.$emit('gameOver', 'draw');
+            } else {
+              console.error('Unexpected game result:', backend_result);
+            }
           }).catch(error => {
             console.error('Error making move:', error);
           });
         }
 
-        const position = this.game.randomMove();
-        this.view.handleTileClick(position);
-
       }
+      this.lastTurn = this.game.turn;
 
       this.autoplayInterval = setTimeout(() => {
         this.autoplayTick();

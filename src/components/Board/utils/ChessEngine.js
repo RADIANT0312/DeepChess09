@@ -904,7 +904,7 @@ class Game {
     const state = this.moveResultState();
     console.log(state);
     if (!state.moves && !state.captures) {
-      alert(
+      console.log(
         state.stalemate
           ? "Stalemate!"
           : `${this.turn === "WHITE" ? "Black" : "White"} Wins!`
@@ -1140,9 +1140,6 @@ class View {
       captures = [],
       type,
     } = this.game.activate(location);
-    console.log(
-      `Tile clicked: ${activePieceId} at ${location.col}${location.row} (${type})`
-    );
     this.drawResetClassNames();
     if (type === "TOUCH") {
       const enPassant = captures.find((capture) => !!capture.capture);
@@ -1159,9 +1156,9 @@ class View {
     }
     if (type === "MOVE" || type === "CAPTURE") {
       // 创建移动记录
-      const moveRecord = `${activePieceId}${type === "CAPTURE" ? "x" : ""}${
-        location.col
-      }${location.row}`;
+      const moveRecord = `${window.lastTouchPosition.col}${
+        window.lastTouchPosition.row
+      }${type === "CAPTURE" ? "" : ""}${location.col}${location.row}`;
 
       // 如果有回调函数，调用它；否则使用全局变量作为后备
       if (this.onMoveCallback) {
@@ -1177,6 +1174,10 @@ class View {
     }
     if (type === "TOUCH") {
       this.drawPositions(moves, captures);
+      window.lastTouchPosition = {
+        col: location.col,
+        row: location.row,
+      };
     } else if (type === "CAPTURE") {
       this.drawCapturedPiece(capturedPieceId);
     }
