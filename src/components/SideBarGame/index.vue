@@ -44,7 +44,10 @@
         </div>
 
         <div class="workplace" v-show="activeWorkplace === 'AIcomment'">
-          <h3>AI Analysis:</h3>
+              <div class="selected-move-info">
+                <span class="move-label">Move {{ Math.floor(selectedMoveIndex / 2) + 1 }}{{ selectedMoveIndex % 2 === 0 ? '' : '...' }}</span>
+                <span class="move-value">{{ moveHistory[selectedMoveIndex] }}</span>
+              </div>
           <div class="ai-comment-container">
             <div v-if="selectedMoveIndex === null" class="no-selection">
               <p class="work-word">Please select a move from the history first to view AI comments.</p>
@@ -54,12 +57,8 @@
               <p class="work-word" style="font-size: 12px; opacity: 0.7;">AI analysis may be processed later.</p>
             </div>
             <div v-else class="comment-content">
-              <div class="selected-move-info">
-                <span class="move-label">Move {{ Math.floor(selectedMoveIndex / 2) + 1 }}{{ selectedMoveIndex % 2 === 0 ? '' : '...' }}</span>
-                <span class="move-value">{{ moveHistory[selectedMoveIndex] }}</span>
-              </div>
               <div class="ai-comment-text">
-                <p class="work-word">{{ getCommentForMove(selectedMoveIndex) }}</p>
+                <div class="work-word markdown-content" v-html="getRenderedCommentForMove(selectedMoveIndex)"></div>
               </div>
             </div>
           </div>
@@ -78,6 +77,8 @@
 
 <script>
 import { user, game } from '@/api'; // Adjust the import path as necessary.
+import { marked } from 'marked';
+
 export default {
   name: 'SideBarGame',
   props: {
@@ -294,6 +295,32 @@ export default {
       }
       const comment = this.aiCommentContent.find(comment => comment.moveIndex === index);
       return comment ? comment.text : '';
+    },
+
+    // 获取渲染后的markdown评论
+    getRenderedCommentForMove(index) {
+      const markdownText = this.getCommentForMove(index);
+      if (!markdownText) {
+        return '';
+      }
+      
+      // 配置marked选项
+      marked.setOptions({
+        breaks: true, // 支持换行
+        gfm: true,    // 支持GitHub风格的markdown
+      });
+      
+      // 渲染markdown并清理多余空格
+      let html = marked(markdownText);
+      
+      // 移除多余的空白字符和空行
+      html = html
+        .replace(/\n\s*\n/g, '\n') // 移除连续的空行
+        .replace(/>\s+</g, '><')    // 移除标签间的空白
+        .replace(/\s+/g, ' ')       // 将多个空格压缩为单个空格
+        .trim();                    // 移除首尾空白
+      
+      return html;
     },
 
   }
@@ -636,8 +663,8 @@ export default {
 
 /* 选中状态的样式 */
 .move-item.selected {
-  background: rgba(102, 234, 183, 0.2) !important;
-  border: 1px solid rgba(102, 234, 183, 0.4);
+  background: rgba(203, 214, 196, 0.562) !important;
+  border: 2px solid rgba(102, 234, 183, 0.4);
   box-shadow: 0 0 6px rgba(102, 234, 183, 0.3);
 }
 
@@ -774,7 +801,7 @@ export default {
 }
 
 .comment-content {
-  padding: 10px;
+  padding: 0px;
 }
 
 .selected-move-info {
@@ -805,7 +832,6 @@ export default {
   background: rgba(255, 255, 255, 0.02);
   border-radius: 6px;
   padding: 12px;
-  border-left: 3px solid #66eab7;
   word-wrap: break-word;
   overflow-wrap: break-word;
   white-space: pre-wrap; /* 保持换行符和空格 */
@@ -818,5 +844,122 @@ export default {
   margin: 0;
   word-wrap: break-word;
   overflow-wrap: break-word;
+}
+
+/* Markdown 渲染样式 */
+.markdown-content {
+  color: #e0e0e0;
+}
+
+.markdown-content h1, 
+.markdown-content h2, 
+.markdown-content h3, 
+.markdown-content h4, 
+.markdown-content h5, 
+.markdown-content h6 {
+  color: #66eab7;
+  margin: 12px 0 8px 0;
+  font-weight: 600;
+}
+
+.markdown-content h1 { font-size: 18px; }
+.markdown-content h2 { font-size: 16px; }
+.markdown-content h3 { font-size: 15px; }
+.markdown-content h4 { font-size: 14px; }
+.markdown-content h5 { font-size: 13px; }
+.markdown-content h6 { font-size: 12px; }
+
+.markdown-content p {
+  margin: 8px 0;
+  line-height: 1.6;
+}
+
+.markdown-content ul, 
+.markdown-content ol {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.markdown-content li {
+  margin: 4px 0;
+  line-height: 1.5;
+}
+
+.markdown-content code {
+  background: rgba(255, 255, 255, 0.1);
+  color: #66eab7;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+}
+
+.markdown-content pre {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 12px;
+  margin: 10px 0;
+  overflow-x: auto;
+}
+
+.markdown-content pre code {
+  background: none;
+  padding: 0;
+  color: #e0e0e0;
+  font-size: 12px;
+}
+
+.markdown-content blockquote {
+  border-left: 3px solid #66eab7;
+  padding-left: 12px;
+  margin: 10px 0;
+  font-style: italic;
+  opacity: 0.9;
+}
+
+.markdown-content strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+.markdown-content em {
+  color: #b0b0b0;
+  font-style: italic;
+}
+
+.markdown-content a {
+  color: #66eab7;
+  text-decoration: none;
+}
+
+.markdown-content a:hover {
+  text-decoration: underline;
+}
+
+.markdown-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 10px 0;
+  font-size: 12px;
+}
+
+.markdown-content th,
+.markdown-content td {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 3px 4px;
+  text-align: left;
+}
+
+.markdown-content th {
+  background: rgba(102, 234, 183, 0.1);
+  color: #66eab7;
+  font-weight: 600;
+}
+
+.markdown-content hr {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin: 15px 0;
 }
 </style>
