@@ -648,7 +648,6 @@ export default {
   margin: 2px 0;
   border-radius: 4px;
   transition: background-color 0.2s ease;
-  font-family: 'Courier New', monospace;
   cursor: pointer;
   position: relative;
 }
@@ -823,7 +822,6 @@ export default {
 
 .move-value {
   color: #e0e0e0;
-  font-family: 'Courier New', monospace;
   font-weight: 500;
   font-size: 14px;
 }
@@ -890,7 +888,6 @@ export default {
   color: #66eab7;
   padding: 2px 4px;
   border-radius: 3px;
-  font-family: 'Courier New', monospace;
   font-size: 12px;
 }
 
